@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "label": "18/10 · 11h",
+    "nome": "Lista de 18/10 · 11h",
+    "arquivo": "secoes_eleitorais_alteradas_2t-pais_2026.csv",
+    "publicadaEm": "2026-10-18T11:00:00-03:00"
+  },
+  {
+    "id": 2,
+    "label": "18/10 · 17h",
+    "nome": "Lista de 18/10 · 17h",
+    "arquivo": "secoes_eleitorais_alteradas_2t-pais_2026 v2.csv",
+    "publicadaEm": "2026-10-18T17:00:00-03:00"
+  },
+  {
+    "id": 3,
+    "label": "19/10 · 11h",
+    "nome": "Lista de 19/10 · 11h",
+    "arquivo": "secoes_eleitorais_alteradas_2t-pais_2026v3.csv",
+    "publicadaEm": "2026-10-19T11:00:00-03:00"
+  },
+  {
+    "id": 4,
+    "label": "20/10 · 13h59",
+    "nome": "Lista de 20/10 · 13h59",
+    "arquivo": "secoes_eleitorais_alteradas_2t-pais_2026_recent.csv",
+    "publicadaEm": "2026-10-20T13:59:00-03:00"
+  },
+  {
+    "id": 5,
+    "label": "20/10 · 15h27",
+    "nome": "Lista de 20/10 · 15h27",
+    "arquivo": "https://cdn.tse.jus.br/estatistica/sead/odsele/arquivos_gerados/eleitorado_eleicao_2026/20261020_152755/5a8ce719fc01c92b7fd1ceb58fe5cd6a/secoes_eleitorais_alteradas_2t-pais_2026.csv.zip",
+    "publicadaEm": "2026-10-20T15:27:55-03:00",
+    "baixadaEm": "2026-10-20T17:46:00-03:00"
+  }
+]

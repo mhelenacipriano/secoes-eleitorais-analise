@@ -3,8 +3,9 @@ import { favorece, nInt, nPct, nPts, quem } from '../format.js';
 import { BarraCandidatos, InfoTip, Legenda } from './ui.jsx';
 
 const GRUPOS = [['removidas', 'Retiradas', 'Estavam na lista anterior e não estão na nova.'], ['mantidas', 'Mantidas', 'Estão nas duas listas.'], ['adicionadas', 'Adicionadas', 'Não estavam na lista anterior e estão na nova.']];
-const ROTULO = { '1-2': 'Atualização 1', '2-3': 'Atualização 2', '3-4': 'Atualização 3', '4-5': 'Atualização 4', '1-5': 'Comparação direta' };
-const CURTO = { '1-2': '1ª → 2ª lista', '2-3': '2ª → 3ª lista', '3-4': '3ª → 4ª lista', '4-5': '4ª → 5ª lista', '1-5': '1ª → 5ª lista' };
+// consecutivas: "Atualização N"; primeira → última: "Comparação direta"
+const rotulo = (t) => (t.ate === t.de + 1 ? `Atualização ${t.de}` : 'Comparação direta');
+const curto = (t) => `${t.de}ª → ${t.ate}ª lista`;
 
 /** Texto gerado a partir dos números: nunca atribui motivo às mudanças. */
 export function interpretar(t) {
@@ -44,7 +45,7 @@ export default function ElectoralProfileComparison({ transicoes }) {
       <div className="seg-ctl" role="radiogroup" aria-label="Escolha a atualização para comparar">
         {transicoes.map((x) => (
           <button key={x.id} role="radio" aria-checked={x.id === id} className={x.id === id ? 'on' : ''} onClick={() => setId(x.id)}>
-            <small>{ROTULO[x.id]}</small>{CURTO[x.id]}
+            <small>{rotulo(x)}</small>{curto(x)}
           </button>
         ))}
       </div>

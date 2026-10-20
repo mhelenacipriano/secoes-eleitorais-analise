@@ -80,7 +80,7 @@ button, select, input { font: inherit; color: inherit; }
 .insight { border-left: 3px solid var(--lula); padding: 4px 0 4px 16px; font-size: 1.05rem; max-width: 64ch; margin-bottom: 18px; }
 
 /* ---------- Timeline ---------- */
-.timeline { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
 .tl-item { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-rows: 90px auto auto auto; gap: 4px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); transition: border-color .25s, background .25s, transform .25s; min-height: 44px; }
 .tl-item:hover { border-color: var(--neutro); }
 .tl-item.ativa { border-color: var(--red-solid); background: var(--panel2); }
@@ -332,3 +332,4 @@ tbody tr.hl td { background: var(--soft); } tbody tr.hl td:first-child { box-sha
 .aviso-tse-grade > div { padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .aviso-tse-grade dt { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); } .aviso-tse-grade dd { margin: 2px 0 0; font-weight: 700; font-size: 1rem; font-variant-numeric: tabular-nums; }
 .aviso-tse-baixada { margin: 0; font-size: .95rem; }
+.aviso-tse-atraso { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--red-solid); color: #fff; font-size: .95rem; }

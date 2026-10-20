@@ -2,6 +2,7 @@ import { useApi } from '../api.js';
 import MethodologyPanel from '../components/MethodologyPanel.jsx';
 import { Card, Carregando } from '../components/ui.jsx';
 import { nInt } from '../format.js';
+import { dataHora, ultimaLista } from '../listas.js';
 
 export default function Metodologia({ meta }) {
   const st = useApi('historia');
@@ -9,7 +10,7 @@ export default function Metodologia({ meta }) {
     <div className="stack">
       <h1 className="page-title">Metodologia e fontes</h1>
       {st.data ? <MethodologyPanel meta={meta} listas={st.data.listas} /> : <Carregando state={st} />}
-      <Card titulo="Listas analisadas" nota={`${nInt(meta.totalSecoes)} seções diferentes aparecem nas listas analisadas (a mais recente é a de 20/10 · 15h27, baixada em 20/10 às 17h46).`}>
+      <Card titulo="Listas analisadas" nota={`${nInt(meta.totalSecoes)} seções diferentes aparecem nas listas analisadas (a mais recente é a de ${ultimaLista().label}${ultimaLista().baixadaEm ? `, baixada em ${dataHora(ultimaLista().baixadaEm)}` : ''}).`}>
         <div className="tablewrap free"><table><thead><tr><th className="left">Publicada em</th><th className="left">Arquivo</th></tr></thead><tbody>
           {meta.listas.map((l) => <tr key={l.id}><td className="left">{l.label}</td><td className="left wrap">{l.arquivo}</td></tr>)}
         </tbody></table></div>

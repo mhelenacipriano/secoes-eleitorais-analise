@@ -6,7 +6,7 @@ import DataTable from '../components/DataTable.jsx';
 import { Baixar, BaixarGrafico, Card, Carregando, Legenda, Recolhivel } from '../components/ui.jsx';
 import { descreveFiltros } from '../exportar.js';
 import Secoes from './Secoes.jsx';
-import { ULTIMA } from '../config.js';
+import { primeiraLista, ultimaLista } from '../listas.js';
 
 const CSV_TROCAS = [{ key: 'passo', label: 'Troca' }, { key: 'situacao', label: 'Situação' }, { key: 'secoes', label: 'Seções' }, { key: 'semResultado', label: 'Sem resultado' }, { key: 'eleitores', label: 'Eleitores' }, { key: (d) => (d.lulaPct == null ? '' : (d.lulaPct * 100).toFixed(2)), label: 'Lula (%)' }, { key: (d) => (d.flavioPct == null ? '' : (d.flavioPct * 100).toFixed(2)), label: 'Flávio (%)' }, { key: (d) => (d.margem == null ? '' : d.margem.toFixed(2)), label: 'Margem (pts)' }];
 
@@ -15,11 +15,11 @@ export default function Mudancas({ filtros }) {
   const st = useApi('mudancas', p);
   if (!st.data) return <Carregando state={st} />;
   const { detalhe, efeito } = st.data;
-  const itens = detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === 1 && d.b === ULTIMA.id)))
+  const itens = detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === primeiraLista().id && d.b === ultimaLista().id)))
     .map((d) => ({ id: `${d.passo}|${d.situacao}`, rotulo: `${d.passo} · ${d.situacao.toLowerCase()} (${nInt(d.secoes)})`, valor: d.margem, dica: [`${nInt(d.secoes)} seções · ${nInt(d.eleitores)} eleitores`, `Lula ${nPct(d.lulaPct)} · Flávio ${nPct(d.flavioPct)}`] }));
   return (
     <div className="stack">
-      <Card titulo="Margem nas seções que saíram, ficaram ou entraram" acoes={<BaixarGrafico titulo="Margem nas seções que saíram, ficaram ou entraram" filtros={descreveFiltros(filtros)} nome="margem-por-troca" csv={{ colunas: CSV_TROCAS, linhas: detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === 1 && d.b === ULTIMA.id))) }} />} nota="Barra à direita (sólida): Lula na frente. Barra à esquerda (listrada): Flávio na frente. A margem é do 1º turno e não indica o motivo da mudança.">
+      <Card titulo="Margem nas seções que saíram, ficaram ou entraram" acoes={<BaixarGrafico titulo="Margem nas seções que saíram, ficaram ou entraram" filtros={descreveFiltros(filtros)} nome="margem-por-troca" csv={{ colunas: CSV_TROCAS, linhas: detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === primeiraLista().id && d.b === ultimaLista().id))) }} />} nota="Barra à direita (sólida): Lula na frente. Barra à esquerda (listrada): Flávio na frente. A margem é do 1º turno e não indica o motivo da mudança.">
         <Legenda />
         <BarrasMargem itens={itens} />
       </Card>

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { nInt, nPts, nSig } from '../format.js';
 import { BarraCandidatos, Legenda } from './ui.jsx';
-import { ULTIMA } from '../config.js';
+import { ehUltima, quando } from '../listas.js';
 
 const FRASE = (l, t, anterior) => {
   if (!t) return 'Esta é a primeira lista publicada. As demais são comparadas com ela.';
@@ -21,7 +21,7 @@ export default function VersionComparison({ lista, transicao, anterior, onSwipe 
       onTouchEnd={(e) => { const dx = e.changedTouches[0].clientX - toque.current; if (Math.abs(dx) > 60) onSwipe(dx < 0 ? 1 : -1); }}>
       <div className="vc-top">
         <div>
-          <p className="vc-kicker">{l.id === ULTIMA.id ? `Versão de ${ULTIMA.quando} (mais recente)` : `Versão de ${l.label.replace(' · ', ' às ')}`}</p>
+          <p className="vc-kicker">{ehUltima(l.id) ? `Versão de ${quando(l.label)} (mais recente)` : `Versão de ${l.label.replace(' · ', ' às ')}`}</p>
           <p className="vc-big"><strong>{nInt(l.secoes)}</strong> seções</p>
         </div>
         <div>

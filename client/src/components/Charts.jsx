@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { nPts, nInt } from '../format.js';
 import { setDestaque, useDestaque } from '../destaque.js';
+import { primeiraLista, ultimaLista } from '../listas.js';
 
 export const COR = { lula: 'var(--lula)', flavio: 'var(--flavio)', neutro: 'var(--neutro)' };
 
@@ -68,14 +69,15 @@ export function BarrasMargem({ itens, rotuloLargura }) {
   );
 }
 
-/** Linha ligando a margem da primeira lista à da lista de 20/10 · 15h27 em cada estado. */
+/** Linha ligando a margem da primeira lista à da lista mais recente em cada estado. */
 export function Halteres({ estados }) {
   const [ref, w] = useWidth();
   const [box, tip, on, off] = useTip();
   const dest = useDestaque();
-  const itens = estados.filter((e) => e.m1 != null && e.m5 != null);
+  const P = primeiraLista(), U = ultimaLista(), mp = 'm' + P.id, mu = 'm' + U.id, ep = 'el' + P.id, eu = 'el' + U.id;
+  const itens = estados.filter((e) => e[mp] != null && e[mu] != null);
   if (!itens.length) return <Empty />;
-  const rowH = 24, H = itens.length * rowH + 34, all = itens.flatMap((e) => [e.m1, e.m5]);
+  const rowH = 24, H = itens.length * rowH + 34, all = itens.flatMap((e) => [e[mp], e[mu]]);
   const lo = Math.min(...all, 0), hi = Math.max(...all, 0), x = (v) => 40 + ((v - lo) / (hi - lo || 1)) * (w - 56);
   const ticks = Array.from({ length: 6 }, (_, i) => lo + ((hi - lo) / 5) * i);
   return (
@@ -87,13 +89,13 @@ export function Halteres({ estados }) {
           const y = 14 + i * rowH;
           return (
             <g key={e.uf} className={'lig' + (dest && dest !== e.uf ? ' dim' : '') + (dest === e.uf ? ' on' : '')} tabIndex={0}
-              aria-label={`${e.uf}. 18/10 · 11h: ${nPts(e.m1)}. 20/10 · 15h27: ${nPts(e.m5)}`}
-              onMouseMove={on([e.uf, `18/10 · 11h: ${nPts(e.m1)} (${nInt(e.el1)} eleitores)`, `20/10 · 15h27: ${nPts(e.m5)} (${nInt(e.el5)} eleitores)`])} onMouseEnter={() => setDestaque(e.uf)} onMouseLeave={() => { off(); setDestaque(''); }} onFocus={() => setDestaque(e.uf)} onBlur={() => setDestaque('')}>
+              aria-label={`${e.uf}. ${P.label}: ${nPts(e[mp])}. ${U.label}: ${nPts(e[mu])}`}
+              onMouseMove={on([e.uf, `${P.label}: ${nPts(e[mp])} (${nInt(e[ep])} eleitores)`, `${U.label}: ${nPts(e[mu])} (${nInt(e[eu])} eleitores)`])} onMouseEnter={() => setDestaque(e.uf)} onMouseLeave={() => { off(); setDestaque(''); }} onFocus={() => setDestaque(e.uf)} onBlur={() => setDestaque('')}>
               <rect x="0" y={y - 12} width={w} height={rowH} fill="transparent" />
               <text x="0" y={y + 4} className="strong">{e.uf}</text>
-              <line x1={x(e.m1)} x2={x(e.m5)} y1={y} y2={y} stroke="var(--neutro)" strokeWidth="2" />
-              <circle cx={x(e.m1)} cy={y} r="5" fill="var(--neutro)" />
-              <circle cx={x(e.m5)} cy={y} r="5" fill="var(--fg)" />
+              <line x1={x(e[mp])} x2={x(e[mu])} y1={y} y2={y} stroke="var(--neutro)" strokeWidth="2" />
+              <circle cx={x(e[mp])} cy={y} r="5" fill="var(--neutro)" />
+              <circle cx={x(e[mu])} cy={y} r="5" fill="var(--fg)" />
             </g>
           );
         })}

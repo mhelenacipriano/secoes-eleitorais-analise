@@ -6,14 +6,9 @@ import { parse } from 'csv-parse/sync';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 
-export const LISTAS = [
-  { id: 1, label: '18/10 · 11h', nome: 'Lista de 18/10 · 11h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026.csv' },
-  { id: 2, label: '18/10 · 17h', nome: 'Lista de 18/10 · 17h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026 v2.csv' },
-  { id: 3, label: '19/10 · 11h', nome: 'Lista de 19/10 · 11h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026v3.csv' },
-  { id: 4, label: '20/10 · 13h59', nome: 'Lista de 20/10 · 13h59', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026_recent.csv' },
-  // atualização das 15h27 no site do TSE; arquivo baixado em 20/10 às 17h46
-  { id: 5, label: '20/10 · 15h27', nome: 'Lista de 20/10 · 15h27', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026.csv (baixado em 20/10 às 17h46)' },
-];
+// Manifesto das listas (server/data/listas.json): id, rótulo, nome, arquivo de origem e quando foi publicada/baixada.
+// O script scripts/atualizar-lista.mjs acrescenta uma linha a cada lista nova.
+export const LISTAS = JSON.parse(fs.readFileSync(path.join(dir, 'data', 'listas.json'), 'utf8'));
 export const IDS = LISTAS.map((l) => l.id);
 export const ULTIMA = LISTAS[LISTAS.length - 1].id;
 
@@ -72,6 +67,8 @@ export function meta() {
   for (const r of rows) (municipios[r.uf] ||= new Set()).add(r.municipio);
   return { listas: LISTAS, ufs: [...new Set(rows.map((r) => r.uf))].sort(), totalSecoes: rows.length,
     semResultado: rows.filter((r) => !temResultado(r)).length,
+    // municípios com seções sem resultado do 1º turno cruzado (para o texto da metodologia), com a primeira lista em que aparecem
+    semResultadoMunicipios: [...rows.filter((r) => !temResultado(r)).reduce((m, r) => { const k = `${r.uf}:${r.municipio}`; const o = m.get(k) || { uf: r.uf, municipio: r.municipio, secoes: 0, primeira: r.em.indexOf(true) + 1 }; o.secoes++; return m.set(k, o); }, new Map()).values()],
     municipios: Object.fromEntries(Object.entries(municipios).map(([k, v]) => [k, [...v].sort((a, b) => a.localeCompare(b, 'pt-BR'))])),
     transicoes: PASSOS.map(([a, b]) => ({ id: `${a}-${b}`, de: a, ate: b, nome: `${LISTAS[a - 1].label} → ${LISTAS[b - 1].label}` })) };
 }
