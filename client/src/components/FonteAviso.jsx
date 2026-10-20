@@ -11,7 +11,7 @@ export default function FonteAviso() {
       <div className="banner-det" id="fonte-detalhes"><div className="banner-det-in">
         <ul>
           <li><strong>Resultados do 1º turno:</strong> disponíveis oficialmente no painel de resultados do SIG/TSE<LinkIcone href={URL_RESULTADOS_1T} rotulo="Painel de resultados do SIG/TSE" />.</li>
-          <li><strong>Listas de seções alteradas:</strong> as três listas datadas (18/10 às 11h, 18/10 às 17h e 19/10 às 11h) e a versão mais recente, com data de publicação não informada, disponível no site original do TSE (painel Seções alteradas do SIG/TSE)<LinkIcone href={URL_SECOES_ALTERADAS} rotulo="Painel Seções alteradas do SIG/TSE" />.</li>
+          <li><strong>Listas de seções alteradas:</strong> as quatro listas datadas (18/10 às 11h, 18/10 às 17h, 19/10 às 11h e 20/10 às 13h59, a mais recente), disponível no site original do TSE (painel Seções alteradas do SIG/TSE)<LinkIcone href={URL_SECOES_ALTERADAS} rotulo="Painel Seções alteradas do SIG/TSE" />.</li>
           <li><strong>Listas anteriores:</strong> não encontramos um link público para elas. Só foi possível acessá-las por meio de <span className="mono">cdn.tse.jus.br</span><LinkIcone href={CDN_TSE} rotulo="cdn.tse.jus.br" />, que não é de acesso público.</li>
           <li><strong>Atenção:</strong> comparativos e gráficos podem conter erros. Para saber o local de votação atual, confirme no aplicativo e-Título ou no Autoatendimento Eleitoral do TSE.</li>
         </ul>

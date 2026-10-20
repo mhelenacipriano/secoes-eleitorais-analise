@@ -30,7 +30,7 @@ const LINHAS = [
 
 /** Duas cidades lado a lado, com uma frase em linguagem simples sobre a diferença. */
 export default function CompararMunicipios() {
-  const [lid, setLid] = useParamNum('l', 4);                // lista usada na comparação (padrão: o painel do TSE, a mais recente)
+  const [lid, setLid] = useParamNum('l', 4);                // lista usada na comparação (padrão: a de 20/10 · 13h59, a mais recente)
   const hist = useApi('historia');
   const lista = useApi('municipios', { lista: String(lid) });
   const [aP, setA] = useParam('a'), [bP, setB] = useParam('b');
@@ -75,7 +75,7 @@ export default function CompararMunicipios() {
       <Card titulo="Comparar dois municípios" nota="Escolha dois municípios para ver, lado a lado, o perfil eleitoral das seções que aparecem nas listas de cada um. O link guarda a sua escolha.">
         <label className="comp-sel comp-lista">Lista usada na comparação
           <select value={lid} onChange={(e) => setLid(Number(e.target.value))}>
-            {hist.data.listas.map((l) => <option key={l.id} value={l.id}>{l.id === 4 ? 'Painel do TSE (mais recente)' : l.nome}</option>)}
+            {hist.data.listas.map((l) => <option key={l.id} value={l.id}>{l.id === 4 ? `${l.nome} (mais recente)` : l.nome}</option>)}
           </select>
         </label>
         <div className="comp-selecao">{seletor('Município A', a, setA, b)}{seletor('Município B', b, setB, a)}</div>

@@ -3,8 +3,8 @@ import { favorece, nInt, nPct, nPts, quem } from '../format.js';
 import { BarraCandidatos, InfoTip, Legenda } from './ui.jsx';
 
 const GRUPOS = [['removidas', 'Retiradas', 'Estavam na lista anterior e não estão na nova.'], ['mantidas', 'Mantidas', 'Estão nas duas listas.'], ['adicionadas', 'Adicionadas', 'Não estavam na lista anterior e estão na nova.']];
-const ROTULO = { '1-2': 'Atualização 1', '2-3': 'Atualização 2', '3-4': 'Painel do TSE', '1-4': 'Comparação direta' };
-const CURTO = { '1-2': '1ª → 2ª lista', '2-3': '2ª → 3ª lista', '3-4': '3ª lista → painel do TSE', '1-4': '1ª lista → painel do TSE' };
+const ROTULO = { '1-2': 'Atualização 1', '2-3': 'Atualização 2', '3-4': 'Atualização 3', '1-4': 'Comparação direta' };
+const CURTO = { '1-2': '1ª → 2ª lista', '2-3': '2ª → 3ª lista', '3-4': '3ª → 4ª lista', '1-4': '1ª → 4ª lista' };
 
 /** Texto gerado a partir dos números: nunca atribui motivo às mudanças. */
 export function interpretar(t) {

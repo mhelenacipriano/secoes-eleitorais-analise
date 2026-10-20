@@ -8,7 +8,7 @@ export default function KeyFacts({ listas, transicoes }) {
   const margens = listas.map((l) => l.margem);
   return (
     <dl className="keyfacts" aria-label="Resumo em três números">
-      <div><dt>Seções nas listas</dt><dd><strong>{nInt(primeira.secoes)}</strong><span aria-hidden="true"> → </span><span className="sr"> para </span><strong>{nInt(ultima.secoes)}</strong></dd><dd className="kf-nota">da primeira lista ao painel mais recente do TSE</dd></div>
+      <div><dt>Seções nas listas</dt><dd><strong>{nInt(primeira.secoes)}</strong><span aria-hidden="true"> → </span><span className="sr"> para </span><strong>{nInt(ultima.secoes)}</strong></dd><dd className="kf-nota">da primeira lista à de 20/10 · 13h59 (a mais recente)</dd></div>
       <div><dt>Entradas e saídas</dt><dd><strong className="t-saiu">−{nInt(saiu)}</strong> <strong className="t-entrou">+{nInt(entrou)}</strong></dd><dd className="kf-nota">registros que saíram e entraram nas atualizações</dd></div>
       <div><dt>Margem de Lula dentro das listas</dt><dd><strong>{nPts(Math.min(...margens))}</strong><span aria-hidden="true"> a </span><span className="sr"> até </span><strong>{nPts(Math.max(...margens))}</strong></dd><dd className="kf-nota">1º turno; não é a margem nacional</dd></div>
     </dl>

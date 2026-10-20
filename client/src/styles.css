@@ -84,7 +84,6 @@ button, select, input { font: inherit; color: inherit; }
 .tl-item { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-rows: 90px auto auto auto; gap: 4px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); transition: border-color .25s, background .25s, transform .25s; min-height: 44px; }
 .tl-item:hover { border-color: var(--neutro); }
 .tl-item.ativa { border-color: var(--red-solid); background: var(--panel2); }
-.tl-item.ultima { border-style: dashed; }
 .tl-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tl-col { display: flex; align-items: flex-end; } .tl-col i { display: block; width: 100%; background: var(--neutro); border-radius: 6px 6px 2px 2px; transition: height .6s ease, background .25s; }
 .tl-item.ativa .tl-col i { background: var(--red-solid); }
