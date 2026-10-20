@@ -84,6 +84,7 @@ try {
     // Não são páginas novas: o endereço da aba não muda, então o que se espera são os iframes, não a URL.
     const diag = async (nome) => {
       await pagina.screenshot({ path: `depuracao-${nome}.png`, fullPage: true }).catch(() => {});
+      console.error(`Salvei ${process.cwd()}/depuracao-${nome}.png e .html`);
       const partes = []; for (const f of pagina.frames()) partes.push(`<!-- ${f.url()} -->\n` + (await f.content().catch(() => '')));
       fs.writeFileSync(`depuracao-${nome}.html`, partes.join('\n'));
     };
@@ -92,8 +93,18 @@ try {
       while (Date.now() < fim_) { const f = pagina.frames().find((x) => x.url().includes(trecho)); if (f) { await f.waitForLoadState('load').catch(() => {}); return f; } await pagina.waitForTimeout(500); }
       return null;
     };
-    await pagina.locator('button, a').filter({ hasText: /gerar arquivos/i }).first().click({ timeout: 15000 });
-    const req = await quadro('requisicao-arquivos', 45000);
+    // botão do APEX: <button class="t-Button" onclick="apex.submit({request:'GERAR'})"><span class="t-Button-label">Gerar arquivos</span></button>
+    const botao = pagina.locator('button').filter({ has: pagina.locator('.t-Button-label', { hasText: /^\s*Gerar arquivos\s*$/i }) }).first();
+    console.error('Procurando o botão "Gerar arquivos"...');
+    await botao.waitFor({ state: 'attached', timeout: 30000 }).catch(async (e) => { await diag('botao'); throw new Error('não achei o botão "Gerar arquivos" (salvei depuracao-botao.*)'); });
+    await botao.scrollIntoViewIfNeeded().catch(() => {});
+    await pagina.waitForTimeout(800);
+    try { await botao.click({ timeout: 8000 }); console.error('Cliquei em "Gerar arquivos".'); }
+    catch (e) {
+      console.error(`Clique normal falhou (${String(e.message).split('\n')[0].slice(0, 100)}); tentando clique direto no elemento.`);
+      await botao.evaluate((el) => el.click());
+    }
+    const req = await quadro('requisicao-arquivos', 60000);
     if (!req) { await diag('requisicao'); throw new Error('a janela "Requisição de arquivos" não abriu (salvei depuracao-requisicao.*)'); }
     await req.waitForLoadState('networkidle').catch(() => {});
     const csvBr = req.locator('input[value="CSV_BR"]').first();                              // tipo de arquivo usado pelo painel
@@ -115,7 +126,7 @@ try {
       const url = await viaGerarArquivos();
       if (url) { console.log(JSON.stringify({ semMudanca: false, publicadaEm, ultimaAtualizacao: publicadaEm, proximaAtualizacao: proxima, total, url })); await fim(0); }
       console.error('Não apareceu o link do arquivo gerado.');
-    } catch (e) { console.error(`Caminho "Gerar arquivos" falhou: ${String(e.message).split('\n')[0].slice(0, 160)}`); }
+    } catch (e) { console.error(`Caminho "Gerar arquivos" falhou: ${String(e.message).split('\n')[0].slice(0, 160)}`); await pagina.screenshot({ path: 'depuracao-falha.png', fullPage: true }).catch(() => {}); console.error(`Salvei ${process.cwd()}/depuracao-falha.png`); }
     if (soOficial) await fim(2, 'Sem o arquivo oficial (--so-oficial).');
     console.error('Usando a leitura da tabela como reserva...');
     await abrePainel();
