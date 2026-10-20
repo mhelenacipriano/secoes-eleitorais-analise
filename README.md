@@ -43,3 +43,15 @@ O front-end (Vite) vira site estático e a API Express roda como função (`api/
 1. Importe o repositório em vercel.com/new (Framework: Other; não mude os comandos, eles vêm do `vercel.json`).
 2. Opcional: defina `VITE_CONSULTA_URL` (endereço da página de consulta) em Settings → Environment Variables para mostrar o link no rodapé.
 3. Deploy. Cada push na branch de produção publica de novo.
+
+## Atualização automática das listas do TSE
+
+O TSE atualiza o painel às 06:25, 11:25, 15:25 e 20:25. Cada lista nova vira a lista N+1 (as anteriores não mudam).
+
+- **Manifesto das listas:** `server/data/listas.json` (id, rótulo, quando foi publicada e baixada). O site lê rótulos, datas e o aviso do TSE daqui; nenhum texto do site tem data fixa.
+- **`node scripts/atualizar-lista.mjs <link .csv.zip | .zip | .csv>`**: baixa, confere (colunas, seções repetidas, tamanho plausível), compara com a lista mais recente (se for igual, não faz nada) e aplica. A data de publicação vem do link do CDN (`…/20261020_152755/…`). Se algo der errado, nada é alterado.
+- **Link do arquivo:** o CDN abre normalmente de qualquer lugar, mas o link **muda a cada publicação** (pasta com data/hora e código). Ele só aparece no painel do SIG/TSE, que **bloqueia data centers** (403). Por isso:
+  - **Manual (GitHub):** Actions → *Atualizar lista do TSE* → *Run workflow* → cole o link. A Vercel publica sozinha.
+  - **Automática (no seu computador):** `scripts/descobrir-url.mjs` abre o painel com o Chrome de verdade (como faz o projeto [gusehr/tse-mudanca-secao](https://github.com/gusehr/tse-mudanca-secao)), acha o link, e `scripts/atualizar-tudo.mjs` roda tudo e faz o push. Requer `npm i -D playwright`. Exemplo de cron (Brasília): `35 6,11,15,20 * * *  cd ~/secoes-eleitorais && CONSULTA_DIR=~/secoes-eleitorais-consulta-2026 node scripts/atualizar-tudo.mjs >> ~/atualizacao.log 2>&1`
+  - O workflow também tem agendamento (09:35/14:35/18:35/23:35 UTC e uma segunda tentativa 20 min depois) que tenta descobrir o link sozinho; se o painel bloquear o GitHub, ele avisa e termina sem erro.
+- **Conferência:** `npm run verificar` recalcula tudo direto do CSV e compara com o que o site mostra.

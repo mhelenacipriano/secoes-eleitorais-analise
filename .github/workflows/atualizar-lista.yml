@@ -1,0 +1,63 @@
+name: Atualizar lista do TSE
+
+# Duas formas de usar:
+#  1) Manual: Actions → "Atualizar lista do TSE" → Run workflow → cole o link do .csv.zip (o CDN do TSE abre normalmente daqui).
+#  2) Agendada: tenta descobrir o link sozinha nos horários abaixo. O painel do TSE costuma bloquear servidores do GitHub (403);
+#     se isso acontecer, o passo avisa e termina sem erro. Nesse caso use a rotina local (scripts/atualizar-tudo.mjs).
+on:
+  schedule:
+    # Brasília = UTC-3. O TSE atualiza às 06:25, 11:25, 15:25 e 20:25; tentamos 10 min depois e de novo 30 min depois
+    # (o GitHub atrasa ou pula execuções em horários de pico).
+    - cron: '35 9,14,18,23 * * *'
+    - cron: '55 9,14,18,23 * * *'
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Link do .csv.zip no CDN do TSE (vazio = tentar descobrir no painel)'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-lista
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+
+      - name: Descobrir o link da lista mais recente
+        id: link
+        env:
+          URL_INFORMADA: ${{ github.event.inputs.url }}
+        run: |
+          if [ -n "$URL_INFORMADA" ]; then echo "url=$URL_INFORMADA" >> "$GITHUB_OUTPUT"; exit 0; fi
+          npm i --no-save playwright >/dev/null 2>&1 && npx playwright install --with-deps chromium >/dev/null 2>&1 || true
+          if saida=$(HEADLESS=1 node scripts/descobrir-url.mjs 2>erro.txt); then
+            echo "url=$(echo "$saida" | tail -n1 | node -pe 'JSON.parse(require("fs").readFileSync(0,"utf8")).url')" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning title=Não foi possível descobrir o link::$(cat erro.txt | head -c 300). Use Run workflow com o link, ou a rotina local."
+            echo "url=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Aplicar a lista (se for nova) e conferir os números
+        id: aplicar
+        if: steps.link.outputs.url != ''
+        run: |
+          node scripts/atualizar-lista.mjs "${{ steps.link.outputs.url }}"
+          npm run verificar
+
+      - name: Enviar para o repositório (a Vercel publica sozinha)
+        if: steps.aplicar.outputs.mudou == 'true'
+        run: |
+          git config user.name "atualizador-listas"
+          git config user.email "actions@users.noreply.github.com"
+          git add server/data
+          git commit -m "Atualiza a lista do TSE: ${{ steps.aplicar.outputs.resumo }}"
+          git push

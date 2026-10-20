@@ -14,7 +14,7 @@ function agg(rs) {
 }
 let falhas = 0;
 const confere = (nome, obtido, esperado, tol = 1e-9) => {
-  const ok = esperado == null ? obtido == null : Math.abs(obtido - esperado) <= tol;
+  const ok = esperado == null ? obtido == null : (Number.isNaN(obtido) && Number.isNaN(esperado)) || Math.abs(obtido - esperado) <= tol;   // grupo sem nenhuma seção com resultado: os dois lados dão NaN
   if (!ok) { falhas++; console.error('✗', nome, obtido, '≠', esperado); } else console.log('✓', nome, typeof obtido === 'number' ? obtido.toFixed(2) : obtido);
 };
 
@@ -41,6 +41,7 @@ confere('seções sem resultado', h.semResultadoTotal, rows.filter((r) => !comRe
 const hist = { '1-2': { rem: [653, 45.77, 46.65], add: [16, 76.07, 19.34] }, '2-3': { rem: [892, 53.04, 40.66], add: [50, 50.39, 43.62] }, '1-5': { rem: [1801, 48.74, 44.31], add: [192, 51.76, 42.04] } };
 for (const [id, g] of Object.entries(hist)) {
   const t = h.transicoes.find((x) => x.id === id);
+  if (!t) continue;   // a comparação direta primeira → última muda de id a cada lista nova; as demais conferências seguem valendo
   for (const [k, nome] of [['rem', 'removidas'], ['add', 'adicionadas']]) {
     // Removidas: contagem total (inclui as 10 sem resultado da 1ª lista). Adicionadas: só as com resultado do 1º turno
     // (as seções novas da última lista não têm cruzamento e ficam fora das porcentagens).
