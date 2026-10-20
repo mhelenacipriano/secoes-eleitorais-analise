@@ -1,7 +1,7 @@
 import { useApi } from '../api.js';
 import { nInt, nPct, nPts, nSig } from '../format.js';
 import { H } from '../hints.js';
-import { CurvasMargem, TabelaListas, leitura } from '../components/Ecdf.jsx';
+import { BarrasFaixas, TabelaListas, leitura } from '../components/Ecdf.jsx';
 import DataTable from '../components/DataTable.jsx';
 import { Baixar, BaixarGrafico, Card, Carregando, Legenda, Recolhivel } from '../components/ui.jsx';
 import { descreveFiltros } from '../exportar.js';
@@ -10,7 +10,7 @@ import { primeiraLista, ultimaLista } from '../listas.js';
 
 const CSV_TROCAS = [{ key: 'passo', label: 'Troca' }, { key: 'situacao', label: 'Situação' }, { key: 'secoes', label: 'Seções' }, { key: 'semResultado', label: 'Sem resultado' }, { key: 'eleitores', label: 'Eleitores' }, { key: (d) => (d.lulaPct == null ? '' : (d.lulaPct * 100).toFixed(2)), label: 'Lula (%)' }, { key: (d) => (d.flavioPct == null ? '' : (d.flavioPct * 100).toFixed(2)), label: 'Flávio (%)' }, { key: (d) => (d.margem == null ? '' : d.margem.toFixed(2)), label: 'Margem (pts)' }];
 
-const CSV_DIST = [{ key: 'label', label: 'Lista' }, { key: 'n', label: 'Seções com resultado' }, { key: (l) => (l.pctLula * 100).toFixed(1), label: 'Lula à frente (%)' }, { key: (l) => (l.pctFlavio * 100).toFixed(1), label: 'Flávio à frente (%)' }, { key: (l) => l.mediana.toFixed(2), label: 'Margem da seção típica (pts)' }];
+const CSV_DIST = [{ key: 'label', label: 'Lista' }, ...['Flávio muito à frente', 'Flávio à frente', 'Equilibradas', 'Lula à frente', 'Lula muito à frente'].map((r, k) => ({ key: (l) => (l.faixas[k] * 100).toFixed(1), label: `${r} (%)` })), { key: 'n', label: 'Seções com resultado' }, { key: (l) => (l.pctLula * 100).toFixed(1), label: 'Lula à frente (%)' }, { key: (l) => (l.pctFlavio * 100).toFixed(1), label: 'Flávio à frente (%)' }, { key: (l) => l.mediana.toFixed(2), label: 'Margem da seção típica (pts)' }];
 
 export default function Mudancas({ filtros }) {
   const p = { uf: filtros.uf, municipio: filtros.municipio, lider: filtros.lider };
@@ -20,9 +20,9 @@ export default function Mudancas({ filtros }) {
   const linhasCsv = detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === primeiraLista().id && d.b === ultimaLista().id)));
   return (
     <div className="stack">
-      <Card titulo="Como as seções de cada lista votaram no 1º turno" acoes={<BaixarGrafico titulo="Distribuição da margem por lista" filtros={descreveFiltros(filtros)} nome="distribuicao-margem-por-lista" csv={{ colunas: CSV_DIST, linhas: dist.data.listas.filter((l) => l.n > 0) }} />}
-        nota="Cada curva é uma lista. Em cada ponto, a altura mostra a parte das seções da lista que tem margem até aquele valor: curvas mais à direita têm seções mais favoráveis a Lula; curvas coladas indicam listas parecidas. A margem é do 1º turno e não indica o motivo da mudança.">
-        <CurvasMargem listas={dist.data.listas} />
+      <Card titulo="Como as seções de cada lista votaram no 1º turno" acoes={<BaixarGrafico titulo="Seções de cada lista por faixa de vantagem" filtros={descreveFiltros(filtros)} nome="distribuicao-margem-por-lista" csv={{ colunas: CSV_DIST, linhas: dist.data.listas.filter((l) => l.n > 0) }} />}
+        nota="Cada barra é uma lista e soma 100% das suas seções. As cores mostram quanto cada seção favoreceu Lula (vermelho) ou Flávio (azul listrado) no 1º turno; o cinza são as seções equilibradas. O gráfico não indica o motivo da mudança de local.">
+        <BarrasFaixas listas={dist.data.listas} />
         <p className="insight">{leitura(dist.data.listas)}</p>
         <TabelaListas listas={dist.data.listas} />
       </Card>

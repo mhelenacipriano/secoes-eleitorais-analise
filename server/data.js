@@ -86,7 +86,7 @@ export function distribuicao(f) {
     const m = rs.filter((r) => r.em[l.id - 1]).map((r) => margem(r.lula, r.flavio, r.lula + r.flavio + r.outros)).sort((a, b) => a - b);
     if (!m.length) return { id: l.id, label: l.label, nome: l.nome, n: 0 };
     return { id: l.id, label: l.label, nome: l.nome, n: m.length, mediana: quantil(m, 0.5), pctLula: m.filter((x) => x > 0).length / m.length, pctFlavio: m.filter((x) => x < 0).length / m.length,
-      q: Array.from({ length: 101 }, (_, i) => +quantil(m, i / 100).toFixed(2)) };
+      faixas: [m.filter((x) => x < -30), m.filter((x) => x >= -30 && x < -10), m.filter((x) => x >= -10 && x <= 10), m.filter((x) => x > 10 && x <= 30), m.filter((x) => x > 30)].map((a) => a.length / m.length) };
   }) };
 }
 
