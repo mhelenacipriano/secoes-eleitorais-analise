@@ -305,3 +305,13 @@ tbody tr.hl td { background: var(--soft); } tbody tr.hl td:first-child { box-sha
 .intervalos-num input { width: 5.5rem; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); font: inherit; }
 .intervalos-res { margin: 0; font-size: .88rem; color: var(--fg2); }
 @media print { .intervalos { display: none; } }
+
+/* faixa de incerteza do cenário */
+.imp-escala { display: flex; justify-content: space-between; color: var(--muted); }
+.faixa { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.faixa-barra { position: relative; height: 22px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); overflow: hidden; }
+.faixa-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--neutro); }
+.faixa-intervalo { position: absolute; top: 4px; bottom: 4px; border-radius: 4px; background: color-mix(in srgb, var(--neutro) 45%, transparent); border: 1px solid var(--neutro); transition: left .2s ease, width .2s ease; }
+.faixa-central { position: absolute; top: 2px; bottom: 2px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--fg); transition: left .2s ease; }
+.faixa-eixo { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); } .faixa .note { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .faixa-intervalo, .faixa-central { transition: none; } }
