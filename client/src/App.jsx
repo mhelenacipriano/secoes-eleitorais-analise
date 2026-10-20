@@ -41,14 +41,14 @@ export default function App() {
         <p className="aviso-obra" role="status"><span className="obra-selo">Em construção</span> Esta página ainda está em construção: o conteúdo, os números e os gráficos podem mudar e conter erros.</p>
         <FonteAviso />
         {!meta.data ? <Carregando state={meta} /> : (
-          <>
+          <div className="pagina-anim" key={pagina || 'home'}>
             {(pagina === 'evolucao' || pagina === 'impacto') && <Filters meta={meta.data} filtros={filtros} setFiltros={setFiltros} usa={{}} />}
             {pagina === '' && <Home ir={ir} />}
             {pagina === 'evolucao' && <Evolucao filtros={filtros} />}
             {pagina === 'impacto' && <Impacto filtros={filtros} />}
             {pagina === 'explorar' && <Explorar sub={sub} meta={meta.data} filtros={filtros} setFiltros={setFiltros} ir={ir} />}
             {pagina === 'metodologia' && <Metodologia meta={meta.data} />}
-          </>
+          </div>
         )}
       </main>
       <footer className="foot">

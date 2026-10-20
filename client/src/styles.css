@@ -258,3 +258,36 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
 @media (max-width: 760px) { .aviso-obra { padding: 8px 12px; font-size: .8rem; } }
 /* aviso legal justificado, com hifenização (html lang="pt-BR") para evitar vãos grandes entre as palavras */
 .foot .legal { text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto; text-wrap: pretty; }
+
+/* ================= Movimento: entradas, transições e hovers ================= */
+@keyframes entra { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.pagina-anim { animation: entra .45s ease both; display: contents; }
+.pagina-anim > * { animation: entra .45s ease both; }
+.banner, .aviso-obra { animation: entra .45s ease both; }
+.nav button { position: relative; }
+.nav button::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: -3px; height: 2px; border-radius: 2px; background: var(--red-solid); transform: scaleX(0); transform-origin: left; transition: transform .28s ease; }
+.btn, .link-acao, .theme-btn, .seg-ctl button, .subnav button, .tl-item, .card, .coluna, .grupo, .conceitos > div, .flow-lista li, .keyfacts > div, .collapse { transition: background-color .22s ease, border-color .22s ease, color .22s ease, transform .22s ease, box-shadow .22s ease; }
+.banner a, .prose a { background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; text-decoration: none; transition: background-size .3s ease; }
+/* avisos recolhíveis: deslizam ao abrir/fechar (no desktop ficam sempre abertos) */
+.banner-det { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .3s ease, margin-top .3s ease; } .banner-det-in { overflow: hidden; min-height: 0; }
+@media (max-width: 760px) {
+  .banner .banner-det { display: grid; grid-template-rows: 0fr; margin-top: 0; }
+  .banner.aberto .banner-det { display: grid; grid-template-rows: 1fr; margin-top: 6px; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .nav button:hover::after { transform: scaleX(1); } .nav button[aria-current="page"]::after { display: none; }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .45); }
+  .btn.primary:hover:not(:disabled) { box-shadow: 0 12px 24px -12px color-mix(in srgb, var(--red-solid) 80%, transparent); }
+  .theme-btn:hover { box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .4); }
+  .card:hover, .coluna:hover, .grupo:hover, .flow-lista li:hover, .keyfacts > div:hover, .collapse:hover { border-color: color-mix(in srgb, var(--red-solid) 34%, var(--line)); }
+  .card:hover, .coluna:hover, .grupo:hover, .flow-lista li:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -20px rgba(0, 0, 0, .55); }
+  .conceitos > div:hover { transform: translateY(-2px); border-top-color: var(--red-solid); }
+  .tl-item:hover:not(.ativa) { transform: translateY(-3px); border-color: var(--red-solid); } .tl-item:hover .tl-col i { filter: brightness(1.12); }
+  .seg-ctl button:hover:not(.on) { transform: translateY(-1px); border-color: var(--red-solid); }
+  .subnav button:hover:not([aria-current="page"]) { transform: translateY(-1px); border-color: var(--red-solid); color: var(--fg); }
+  tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--red-solid); }
+  .banner a:hover, .prose a:hover { background-size: 0 1px; background-position: 100% 100%; }
+  .collapse summary:hover { color: var(--red-solid); }
+  .totop:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgba(0, 0, 0, .5); } .totop { transition: transform .2s ease, box-shadow .2s ease; }
+}
+@media (prefers-reduced-motion: reduce) { .pagina-anim, .pagina-anim > *, .banner, .aviso-obra { animation: none !important; } .nav button::after { transition: none; } }
