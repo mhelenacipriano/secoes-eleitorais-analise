@@ -17,7 +17,9 @@ const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const opc = (nome) => { const i = args.indexOf(nome); return i >= 0 ? args[i + 1] : null; };
 const simular = args.includes('--simular');
-const origem = args.find((a) => !a.startsWith('--') && a !== opc('--publicada-em'));
+const origem = args.find((a) => !a.startsWith('--') && a !== opc('--publicada-em') && a !== opc('--fonte'));
+const fonte = opc('--fonte');   // texto para o manifesto quando a origem é um arquivo local (ex.: "painel do SIG/TSE (leitura da tabela)")
+const ns = (t) => String(t || '').replace(/\s+/g, ' ').trim();   // o painel junta espaços repetidos: compara sem essa diferença
 const falha = (msg) => { console.error('ERRO:', msg); process.exit(1); };
 if (!origem) falha('Informe o link ou o arquivo da lista (veja o cabeçalho do script).');
 
@@ -62,7 +64,7 @@ if (novos.length < na.length * 0.4 || novos.length > na.length * 2.5) falha(`${n
 // 4) mudou em relação à lista mais recente?
 const anterior = new Map(na.map((r) => [[r.uf, r.municipio, Number(r.zona), Number(r.secao)].join('|'), r]));
 let entraram = 0, sairam = 0, trocaram = 0;
-for (const [k, r] of conj) { const a = anterior.get(k); if (!a) entraram++; else if (a.local_inicial !== r.nm_local_votacao_inicial || a.local_final !== r.nm_local_votacao_final) trocaram++; }
+for (const [k, r] of conj) { const a = anterior.get(k); if (!a) entraram++; else if (ns(a.local_inicial) !== ns(r.nm_local_votacao_inicial) || ns(a.local_final) !== ns(r.nm_local_votacao_final)) trocaram++; }
 for (const k of anterior.keys()) if (!conj.has(k)) sairam++;
 if (!entraram && !sairam && !trocaram) {
   console.log(`Sem mudança: o arquivo é igual à lista ${ultima.id} (${ultima.label}).`);
@@ -83,7 +85,7 @@ fs.writeFileSync(destinoCsv, bytes);
 const copiaSeg = { csv: fs.readFileSync(path.join(raiz, 'server/data/secoes_v.csv')), listas: fs.readFileSync(arquivoListas) };
 try {
   execFileSync(process.execPath, [path.join(raiz, 'scripts/aplicar-lista-recente.mjs'), destinoCsv, String(N)], { stdio: 'inherit' });
-  listas.push({ id: N, label: rotulo, nome: `Lista de ${rotulo}`, arquivo: /^https?:/.test(origem) ? origem : path.basename(origem), publicadaEm: pub.toISOString().replace(/\.\d{3}Z$/, 'Z'), baixadaEm: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z') });
+  listas.push({ id: N, label: rotulo, nome: `Lista de ${rotulo}`, arquivo: /^https?:/.test(origem) ? origem : (fonte || path.basename(origem)), publicadaEm: pub.toISOString().replace(/\.\d{3}Z$/, 'Z'), baixadaEm: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z') });
   fs.writeFileSync(arquivoListas, JSON.stringify(listas, null, 2) + '\n');
 } catch (e) {   // desfaz tudo se algo falhar no meio
   fs.writeFileSync(path.join(raiz, 'server/data/secoes_v.csv'), copiaSeg.csv); fs.writeFileSync(arquivoListas, copiaSeg.listas); fs.rmSync(destinoCsv, { force: true });

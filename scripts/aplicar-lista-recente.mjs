@@ -39,7 +39,8 @@ for (const [k, n] of nova) {
     base.push(r); porChave.set(k, r); adicionados++; continue;
   }
   if (r[V] !== '1') { r[V] = '1'; reativados++; }
-  if (r.local_inicial !== n.nm_local_votacao_inicial || r.local_final !== n.nm_local_votacao_final) { r.local_inicial = n.nm_local_votacao_inicial; r.local_final = n.nm_local_votacao_final; atualizados++; }
+  const ns = (t) => String(t || '').replace(/\s+/g, ' ').trim();   // espaços repetidos não contam como mudança
+  if (ns(r.local_inicial) !== ns(n.nm_local_votacao_inicial) || ns(r.local_final) !== ns(n.nm_local_votacao_final)) { r.local_inicial = n.nm_local_votacao_inicial; r.local_final = n.nm_local_votacao_final; atualizados++; }
   r[EL] = n.qt_eleitores;
 }
 for (const [k, r] of porChave) if (r[V] === '1' && !nova.has(k)) { r[V] = '0'; r[EL] = '0'; retirados++; }
