@@ -3,3 +3,4 @@ client/dist
 .DS_Store
 .raspagem.csv
 .tmp-lista.zip
+depuracao-painel.*

@@ -16,11 +16,13 @@
 //   --ultima   quando foi publicada a lista que já temos: se o painel disser a mesma data/hora, não raspa (sem mudança).
 //   --forcar   raspa mesmo assim.
 // Imprime UMA linha de JSON: { semMudanca, publicadaEm, ultimaAtualizacao, proximaAtualizacao, total, url | csv }
-// Variáveis: HEADLESS=1 (sem janela; costuma ser bloqueado), PAINEL_URL (outro endereço).
+// Variáveis: HEADLESS=1 (sem janela; costuma ser bloqueado), PAINEL_BASE (outro endereço base).
 // Códigos de saída: 0 ok · 2 layout inesperado/contagem não confere · 3 acesso bloqueado ou falha ao abrir.
 import fs from 'node:fs';
 
-const PAINEL = process.env.PAINEL_URL || 'https://sig.tse.jus.br/ords/dwapr/r/seai/sig-eleicao-eleitorado/se%C3%A7%C3%B5es-alteradas';
+// O painel só abre "Seções alteradas" depois de navegar pelo menu (o endereço direto manda para a página inicial):
+// Eleitorado da eleição → Capilaridade → "Tabelas detalhadas" da região "Seções Eleitorais Alteradas no Segundo Turno".
+const BASE = process.env.PAINEL_BASE || 'https://sig.tse.jus.br/ords/dwapr/r/seai/sig-eleicao-eleitorado/';
 const args = process.argv.slice(2);
 const opc = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : null; };
 const saida = opc('--saida') || '.raspagem.csv', ultima = opc('--ultima'), forcar = args.includes('--forcar');
@@ -37,9 +39,24 @@ const fim = async (codigo, msg) => { if (msg) console.error(msg); await navegado
 
 try {
   const pagina = await (await navegador.newContext({ locale: 'pt-BR', viewport: { width: 1400, height: 900 } })).newPage();
-  const resp = await pagina.goto(PAINEL, { waitUntil: 'networkidle', timeout: 90000 });
-  if (resp && resp.status() === 403) await fim(3, 'Acesso bloqueado pelo TSE (403). Rode em uma rede comum, com HEADLESS desligado.');
-  await pagina.waitForSelector(TABELA, { timeout: 60000 }).catch(() => fim(2, 'Não encontrei a tabela de seções alteradas (o layout do painel mudou?).'));
+  // abre a página "Seções alteradas" pelo caminho do menu (e confere que a tabela apareceu)
+  async function abrePainel() {
+    const resp = await pagina.goto(BASE + 'eleitorado-eleicao', { waitUntil: 'networkidle', timeout: 90000 });
+    if (resp && resp.status() === 403) await fim(3, 'Acesso bloqueado pelo TSE (403). Rode em uma rede comum, com HEADLESS desligado.');
+    if (!(await pagina.locator(TABELA).count())) {
+      await pagina.locator("a.a-TreeView-label:text-is('Capilaridade')").first().click({ timeout: 30000 });
+      await pagina.waitForLoadState('networkidle');
+      await pagina.locator("button:has-text('Tabelas detalhadas')[onclick*='alteradas']").first().click({ timeout: 30000 });
+      await pagina.waitForLoadState('networkidle');
+    }
+    await pagina.waitForSelector(TABELA, { timeout: 60000 }).catch(async () => {
+      // guarda o que o navegador viu, para diagnóstico
+      await pagina.screenshot({ path: 'depuracao-painel.png', fullPage: true }).catch(() => {});
+      fs.writeFileSync('depuracao-painel.html', await pagina.content().catch(() => ''));
+      await fim(2, `Não encontrei a tabela de seções alteradas (cheguei em: ${pagina.url()}). Salvei depuracao-painel.png e depuracao-painel.html: me envie.`);
+    });
+  }
+  await abrePainel();
 
   // "Última atualização: 20.10.2026 - 15:27 \ Próxima atualização: 20.10.2026 - 20:25 \ Frequência de atualização: às 06:25, ..."
   const texto = limpa(await pagina.locator('.t-atualizado-em').first().innerText().catch(() => ''));
@@ -85,8 +102,7 @@ try {
     } catch (e) { console.error(`Caminho "Gerar arquivos" falhou: ${String(e.message).split('\n')[0].slice(0, 160)}`); }
     if (soOficial) await fim(2, 'Sem o arquivo oficial (--so-oficial).');
     console.error('Usando a leitura da tabela como reserva...');
-    await pagina.goto(PAINEL, { waitUntil: 'networkidle', timeout: 90000 });
-    await pagina.waitForSelector(TABELA, { timeout: 60000 });
+    await abrePainel();
   }
 
   const cab = (await pagina.$$eval(`${TABELA} thead th`, (t) => t.map((x) => x.innerText))).map(limpa);
