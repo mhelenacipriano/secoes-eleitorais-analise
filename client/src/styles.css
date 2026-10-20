@@ -283,8 +283,6 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
   .card:hover, .coluna:hover, .grupo:hover, .flow-lista li:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -20px rgba(0, 0, 0, .55); }
   .conceitos > div:hover { transform: translateY(-2px); border-top-color: var(--red-solid); }
   .tl-item:hover:not(.ativa) { transform: translateY(-3px); border-color: var(--red-solid); } .tl-item:hover .tl-col i { filter: brightness(1.12); }
-  .seg-ctl button:hover:not(.on) { transform: translateY(-1px); border-color: var(--red-solid); }
-  .subnav button:hover:not([aria-current="page"]) { transform: translateY(-1px); border-color: var(--red-solid); color: var(--fg); }
   tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--red-solid); }
   .banner a:hover, .prose a:hover { background-size: 0 1px; background-position: 100% 100%; }
   .collapse summary:hover { color: var(--red-solid); }
