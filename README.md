@@ -59,3 +59,14 @@ O TSE atualiza o painel às 06:25, 11:25, 15:25 e 20:25. Cada lista nova vira a 
 
 `scripts/votacao-secao.mjs` lê a votação por seção do TSE (`votacao_secao_2026_BR.zip`, ~1 GB descompactado) e grava `.dados/votacao_secoes.csv` (ignorado pelo git).
 `scripts/gerar-controle.mjs` cruza esse arquivo com as seções das listas e grava `server/data/controle.json` (pequeno, versionado): diferença de margem entre seções alteradas e as demais do mesmo município, com IC 95% por bootstrap de municípios e teste de permutação. Aparece em Explorar → Grupo de controle. Rode os dois scripts de novo quando as listas mudarem.
+
+### Atualização automática no Mac (launchd)
+
+O painel do TSE bloqueia servidores, então a rotina completa (`scripts/atualizar-tudo.mjs`) roda no seu computador:
+
+```
+bash scripts/agendar-mac.sh ~/caminho/secoes-eleitorais-consulta-2026   # instala: 06:35, 11:35, 15:35 e 20:35
+bash scripts/agendar-mac.sh --agora                                      # testa uma vez
+bash scripts/agendar-mac.sh --remover                                    # desinstala
+```
+Log em `~/Library/Logs/secoes-eleitorais-atualizacao.log`. Se o Mac estiver dormindo no horário, roda quando acordar. O git precisa dar push sem pedir senha.
