@@ -104,8 +104,23 @@ const resultado = {
 };
 
 // por município (para o mapa e o funil): margem das alteradas vs. controle
+// desvio-padrão da margem entre seções do mesmo município (só controle): é o "ruído natural" usado no funil de incerteza
+{ let ss = 0, nn = 0; for (const mu of muns.values()) if (mu.alt.length && mu.ctrl.length > 1) { const mm = media(mu.ctrl.map((x) => x.m)); for (const x of mu.ctrl) { ss += (x.m - mm) ** 2; nn++; } } resultado.sigma = +Math.sqrt(ss / (nn - 1)).toFixed(2); }
+// seções do mesmo local de votação se parecem: correlação intra-local (ρ) da margem nas seções de controle, e quantas seções alteradas há por local.
+// O "efeito de desenho" 1+(m−1)ρ alarga a faixa do funil (a incerteza real é maior do que se cada seção fosse independente).
+{
+  const loc = new Map();
+  for (const [k, t] of tse) { const m = margem(t); if (m == null || alteradas.has(k)) continue; const mu = muns.get(`${t.uf}|${norm(t.mun)}`); if (!mu || !mu.alt.length || mu.ctrl.length < 2) continue; const mm = media(mu.ctrl.map((x) => x.m)); const id = `${t.uf}|${norm(t.mun)}|${t.local}`; (loc.get(id) || loc.set(id, []).get(id)).push(m - mm); }
+  let cruz = 0, pares = 0;
+  for (const v of loc.values()) { if (v.length < 2) continue; const s1 = v.reduce((a, x) => a + x, 0), s2 = v.reduce((a, x) => a + x * x, 0); cruz += s1 * s1 - s2; pares += v.length * (v.length - 1); }
+  const rho = Math.max(0, cruz / pares / resultado.sigma ** 2);
+  const locaisAlt = new Set(); let nAlt = 0;
+  for (const [k, a] of alteradas) { if (!tse.has(k)) continue; nAlt++; locaisAlt.add(`${tse.get(k).uf}|${norm(tse.get(k).mun)}|${a.local}`); }
+  const mPorLocal = nAlt / locaisAlt.size;
+  resultado.rho = +rho.toFixed(3); resultado.secoesPorLocal = +mPorLocal.toFixed(2); resultado.efeitoDesenho = +(1 + (mPorLocal - 1) * rho).toFixed(2);
+}
 resultado.porMunicipio = [...muns.values()].filter((mu) => mu.alt.length).map((mu) => ({
-  uf: mu.uf, municipio: mu.municipio, alteradas: mu.alt.length, secoes: mu.alt.length + mu.ctrl.length,
+  uf: mu.uf, municipio: mu.municipio, alteradas: mu.alt.length, controle: mu.ctrl.length, secoes: mu.alt.length + mu.ctrl.length,
   margemAlteradas: +media(mu.alt.map((x) => x.m)).toFixed(2), margemControle: mu.ctrl.length ? +media(mu.ctrl.map((x) => x.m)).toFixed(2) : null,
 })).sort((a, b) => b.alteradas - a.alteradas);
 
