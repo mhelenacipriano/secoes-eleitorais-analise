@@ -10,7 +10,7 @@ export const LISTAS = [
   { id: 1, label: '18/10 · 11h', nome: 'Lista de 18/10 · 11h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026.csv' },
   { id: 2, label: '18/10 · 17h', nome: 'Lista de 18/10 · 17h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026 v2.csv' },
   { id: 3, label: '19/10 · 11h', nome: 'Lista de 19/10 · 11h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026v3.csv' },
-  { id: 4, label: 'Última lista', nome: 'Última lista', arquivo: 'secoes_eleitorais_alteradas_2t-regiao_2026.csv (data não informada)' },
+  { id: 4, label: 'Painel do TSE', nome: 'Painel do TSE (mais recente)', arquivo: 'secoes_eleitorais_alteradas_2t-regiao_2026.csv (data não informada)' },
 ];
 
 const num = (x) => Number(x) || 0;

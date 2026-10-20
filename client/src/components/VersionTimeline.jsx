@@ -24,7 +24,7 @@ export default function VersionTimeline({ listas, selecionada, onSelect }) {
             className={'tl-item' + (ativa ? ' ativa' : '') + (ultima ? ' ultima' : '')} onClick={() => onSelect(l.id)} onKeyDown={(e) => onKey(e, i)}>
             <span className="tl-col" aria-hidden="true"><i style={{ height: `${Math.max(6, (l.secoes / max) * 100)}%` }} /></span>
             <span className="tl-data">
-              {ultima ? <>Última lista analisada<small>data não informada</small></> : <>{PARTES[l.id][0]}<small>{PARTES[l.id][1]}</small></>}
+              {ultima ? <>Painel do TSE<small>mais recente · sem data</small></> : <>{PARTES[l.id][0]}<small>{PARTES[l.id][1]}</small></>}
             </span>
             <span className="tl-n">{nInt(l.secoes)}<small> seções</small></span>
             <span className={'tl-m ' + (l.margem >= 0 ? 'pos' : 'neg')}>{nPts(l.margem)}</span>

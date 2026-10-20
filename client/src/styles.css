@@ -249,3 +249,4 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
   .banner-toggle { display: inline-flex; align-items: center; min-height: 36px; margin-top: 2px; padding: 0; border: 0; background: none; color: var(--red-solid); font: inherit; font-weight: 600; font-size: .8rem; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 }
 @media print { .banner-det { display: block !important; } .banner-toggle { display: none !important; } }
+@media (max-width: 760px) { .brand { flex: 1 1 0; min-width: 0; line-height: 1.2; } }

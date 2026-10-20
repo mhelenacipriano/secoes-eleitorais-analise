@@ -27,7 +27,7 @@ export default function Home({ ir }) {
       {!st.data ? <Carregando state={st} /> : (
         <>
           <KeyFacts listas={st.data.listas} transicoes={st.data.transicoes} />
-          <Secao id="evolucao" letra="1 · A evolução das listas" titulo="Quatro listas, composições bem diferentes" intro="Toque em uma versão para ver quantas seções e eleitores ela reunia e como era o voto do 1º turno nessas seções.">
+          <Secao id="evolucao" letra="1 · A evolução das listas" titulo="Três listas e o painel mais recente, com composições bem diferentes" intro="Toque em uma versão para ver quantas seções e eleitores ela reunia e como era o voto do 1º turno nessas seções.">
             <EvolucaoListas listas={st.data.listas} transicoes={st.data.transicoes} />
           </Secao>
           <Secao letra="2 · O que realmente mudou" titulo="As atualizações não apenas removeram seções. Elas também adicionaram outras." intro="Cada faixa mostra as seções que continuaram na lista; as que saíram e as que entraram aparecem com seus números.">

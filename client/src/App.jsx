@@ -28,7 +28,7 @@ export default function App() {
     <div className="app">
       <a className="skip" href="#conteudo">Ir para o conteúdo</a>
       <div className="topbar">
-        <button className="brand" onClick={() => vai('')}>Seções eleitorais · 2026</button>
+        <button className="brand" onClick={() => vai('')}>Análise das seções alteradas · 2026</button>
         <div className="top-actions">
           <ThemeToggle />
           <button className="menu-btn" aria-expanded={menu} aria-controls="nav" onClick={() => setMenu((m) => !m)}>{menu ? 'Fechar' : 'Menu'}</button>

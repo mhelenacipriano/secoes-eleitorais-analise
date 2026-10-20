@@ -7,7 +7,7 @@ export default function HeroSection({ onSaiba, onExplorar }) {
       <Reveal>
         <p className="eyebrow">Eleições 2026 · Presidente · 2º turno</p>
         <h1>O que mudou nas seções eleitorais — e quem poderia ser afetado?</h1>
-        <p className="hero-sub">Analisamos quatro listas de locais de votação alterados para o segundo turno de 2026 e cruzamos seus registros com os resultados do primeiro turno.</p>
+        <p className="hero-sub">Analisamos três listas de locais de votação alterados divulgadas pelo TSE e a versão mais recente do site original (painel Seções alteradas), para o segundo turno de 2026, e cruzamos seus registros com os resultados do primeiro turno.</p>
         <p className="disclaimer" role="note">
           <strong>Importante:</strong> os dados mostram o perfil eleitoral das seções, não comprovam mudanças no resultado da eleição.
         </p>
