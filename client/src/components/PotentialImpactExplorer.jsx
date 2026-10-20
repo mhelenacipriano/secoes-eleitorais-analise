@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useParam, useParamNum } from '../router.js';
 import { nInt, nPct } from '../format.js';
 import { InfoTip } from './ui.jsx';
+import { ULTIMA } from '../config.js';
 
 const dois = (l) => (l.lula + l.flavio ? l.lula / (l.lula + l.flavio) : 0.5);
 
@@ -60,7 +61,7 @@ export default function PotentialImpactExplorer({ listas }) {
       <div className="imp-controls">
         <label>Lista de seções
           <select value={id} onChange={(e) => { setId(Number(e.target.value)); setPref(null); setComp(null); }}>
-            {listas.map((x) => <option key={x.id} value={x.id}>{x.id === 4 ? `${x.nome} (mais recente)` : x.nome} — {nInt(x.eleitores)} eleitores</option>)}
+            {listas.map((x) => <option key={x.id} value={x.id}>{x.id === ULTIMA.id ? `${x.nome} (mais recente)` : x.nome} — {nInt(x.eleitores)} eleitores</option>)}
           </select>
         </label>
         <label>

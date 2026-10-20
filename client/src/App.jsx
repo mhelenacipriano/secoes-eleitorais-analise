@@ -10,6 +10,7 @@ import Filters from './components/Filters.jsx';
 import { Carregando } from './components/ui.jsx';
 import ThemeToggle from './components/ThemeToggle.jsx';
 import FonteAviso from './components/FonteAviso.jsx';
+import AvisoTse from './components/AvisoTse.jsx';
 import ToTop from './components/ToTop.jsx';
 import { CONSULTA_URL } from './config.js';
 
@@ -39,6 +40,7 @@ export default function App() {
       </div>
       <main id="conteudo">
         <p className="aviso-obra" role="status"><span className="obra-selo">Em construção</span> Esta página ainda está em construção: o conteúdo, os números e os gráficos podem mudar e conter erros.</p>
+        <AvisoTse />
         <FonteAviso />
         {!meta.data ? <Carregando state={meta} /> : (
           <div className="pagina-anim" key={pagina || 'home'}>

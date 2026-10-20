@@ -18,7 +18,7 @@ export default function SectionTransitionFlow({ listas, transicoes, filtros }) {
   const esc = (H - topo - baixo - desce - 30) / max;
   const gap = (w - 24 - cols.length * colW) / (cols.length - 1);
   const x = (i) => 12 + i * (colW + gap);
-  const nomes = ['18/10 · 11h', '18/10 · 17h', '19/10 · 11h', '20/10 · 13h59'];
+  const nomes = ['18/10 · 11h', '18/10 · 17h', '19/10 · 11h', '20/10 · 13h59', '20/10 · 15h27'];
   const faixa = (x0, y0, x1, y1, h) => {
     const m = (x0 + x1) / 2;
     return `M${x0},${y0} C${m},${y0} ${m},${y1} ${x1},${y1} L${x1},${y1 + h} C${m},${y1 + h} ${m},${y0 + h} ${x0},${y0 + h} Z`;
@@ -63,8 +63,8 @@ export default function SectionTransitionFlow({ listas, transicoes, filtros }) {
         csv={{ colunas: [{ key: 'rotulo', label: 'Troca' }, { key: (t) => t.removidas.secoes, label: 'Saíram' }, { key: (t) => t.mantidas.secoes, label: 'Ficaram' }, { key: (t) => t.adicionadas.secoes, label: 'Entraram' }], linhas: transicoes }} />
       <ul className="flow-lista">
         {transicoes.map((t) => (
-          <li key={t.id} className={t.id === '1-4' ? 'cumul' : ''}>
-            <strong>{t.id === '1-4' ? 'Primeira lista → lista de 20/10 · 13h59 (comparação direta)' : t.rotulo}</strong>
+          <li key={t.id} className={t.id === '1-5' ? 'cumul' : ''}>
+            <strong>{t.id === '1-5' ? 'Primeira lista → lista de 20/10 · 15h27 (comparação direta)' : t.rotulo}</strong>
             <span><b className="t-saiu">−{nInt(t.removidas.secoes)}</b> saíram</span>
             <span><b>{nInt(t.mantidas.secoes)}</b> ficaram</span>
             <span><b className="t-entrou">+{nInt(t.adicionadas.secoes)}</b> entraram</span>

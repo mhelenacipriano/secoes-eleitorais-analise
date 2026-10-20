@@ -38,7 +38,7 @@ confere('seções únicas', h.totalSecoes, rows.length);
 confere('seções sem resultado', h.semResultadoTotal, rows.filter((r) => !comRes(r)).length);
 
 // Resultados históricos informados (arredondados a 2 casas): têm de bater com o CSV.
-const hist = { '1-2': { rem: [653, 45.77, 46.65], add: [16, 76.07, 19.34] }, '2-3': { rem: [892, 53.04, 40.66], add: [50, 50.39, 43.62] }, '1-4': { rem: [1793, 48.78, 44.27], add: [192, 51.76, 42.04] } };
+const hist = { '1-2': { rem: [653, 45.77, 46.65], add: [16, 76.07, 19.34] }, '2-3': { rem: [892, 53.04, 40.66], add: [50, 50.39, 43.62] }, '1-5': { rem: [1801, 48.74, 44.31], add: [192, 51.76, 42.04] } };
 for (const [id, g] of Object.entries(hist)) {
   const t = h.transicoes.find((x) => x.id === id);
   for (const [k, nome] of [['rem', 'removidas'], ['add', 'adicionadas']]) {

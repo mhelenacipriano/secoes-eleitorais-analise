@@ -1,7 +1,8 @@
 import { useRef } from 'react';
 import { nInt, nPts } from '../format.js';
+import { ULTIMA } from '../config.js';
 
-const PARTES = { 1: ['18/10', '11h'], 2: ['18/10', '17h'], 3: ['19/10', '11h'], 4: ['20/10', '13h59'] };
+const PARTES = { 1: ['18/10', '11h'], 2: ['18/10', '17h'], 3: ['19/10', '11h'], 4: ['20/10', '13h59'], 5: ['20/10', '15h27'] };
 
 /** Linha do tempo horizontal: a altura de cada coluna é proporcional ao número de seções. */
 export default function VersionTimeline({ listas, selecionada, onSelect }) {
@@ -18,7 +19,7 @@ export default function VersionTimeline({ listas, selecionada, onSelect }) {
   return (
     <div className="timeline" role="tablist" aria-label="Versões da lista de seções alteradas">
       {listas.map((l, i) => {
-        const ativa = l.id === selecionada, ultima = l.id === 4;
+        const ativa = l.id === selecionada, ultima = l.id === ULTIMA.id;
         return (
           <button key={l.id} ref={(el) => (refs.current[i] = el)} role="tab" aria-selected={ativa} tabIndex={ativa ? 0 : -1}
             className={'tl-item' + (ativa ? ' ativa' : '') + (ultima ? ' ultima' : '')} onClick={() => onSelect(l.id)} onKeyDown={(e) => onKey(e, i)}>

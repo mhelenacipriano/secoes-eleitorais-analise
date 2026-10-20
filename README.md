@@ -16,7 +16,7 @@ npm run verificar   # recalcula tudo do CSV e compara com a API
 
 ## Dados
 
-`server/data/secoes_v.csv` consolida as quatro listas (18/10 11h, 18/10 17h, 19/10 11h e 20/10 13h59, esta última do site original do TSE, painel Seções alteradas) e os votos do 1º turno. A lista mais recente, de 20/10 13h59 (448 seções), vale por inteira, mesmo para seções sem cruzamento com as demais listas ou com os votos (entram como "sem resultado"). Ela vem de `server/data/fontes/secoes_eleitorais_alteradas_2t-pais_2026_recent.csv` e é aplicada com `node scripts/aplicar-lista-recente.mjs <csv>` (confere que são as mesmas seções e atualiza os locais de votação).
+`server/data/secoes_v.csv` consolida várias listas (18/10 11h, 18/10 17h, 19/10 11h, 20/10 13h59 e 20/10 15h27 — as duas últimas do site original do TSE, painel Seções alteradas) e os votos do 1º turno. A lista mais recente, de 20/10 15h27 (453 seções, baixada em 20/10 às 17h46), vale por inteira, mesmo para seções sem cruzamento com as demais listas ou com os votos (entram como "sem resultado"). Ela vem de `server/data/fontes/secoes_eleitorais_alteradas_2t-pais_2026_lista5.csv` e é aplicada com `node scripts/aplicar-lista-recente.mjs <csv> <número da lista>` (uma lista nova cria as colunas dela sem alterar as anteriores) (confere que são as mesmas seções e atualiza os locais de votação).
 
 ## Navegação
 

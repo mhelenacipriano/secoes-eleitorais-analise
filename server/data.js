@@ -11,14 +11,18 @@ export const LISTAS = [
   { id: 2, label: '18/10 · 17h', nome: 'Lista de 18/10 · 17h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026 v2.csv' },
   { id: 3, label: '19/10 · 11h', nome: 'Lista de 19/10 · 11h', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026v3.csv' },
   { id: 4, label: '20/10 · 13h59', nome: 'Lista de 20/10 · 13h59', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026_recent.csv' },
+  // atualização das 15h27 no site do TSE; arquivo baixado em 20/10 às 17h46
+  { id: 5, label: '20/10 · 15h27', nome: 'Lista de 20/10 · 15h27', arquivo: 'secoes_eleitorais_alteradas_2t-pais_2026.csv (baixado em 20/10 às 17h46)' },
 ];
+export const IDS = LISTAS.map((l) => l.id);
+export const ULTIMA = LISTAS[LISTAS.length - 1].id;
 
 const num = (x) => Number(x) || 0;
 const rows = parse(fs.readFileSync(path.join(dir, 'data', 'secoes_v.csv')), { columns: true, skip_empty_lines: true }).map((r) => ({
   uf: r.uf, municipio: r.municipio, zona: num(r.zona), secao: num(r.secao),
   localInicial: r.local_inicial, localFinal: r.local_final,
-  em: [1, 2, 3, 4].map((k) => num(r['v' + k]) === 1),
-  el: [1, 2, 3, 4].map((k) => num(r['el_v' + k])),
+  em: IDS.map((k) => num(r['v' + k]) === 1),
+  el: IDS.map((k) => num(r['el_v' + k])),
   eleitores: num(r.eleitores), aptos: num(r.aptos), temVoto: num(r.tem_voto) === 1,
   lula: num(r.lula), flavio: num(r.flavio), outros: num(r.outros),
 }));
@@ -27,7 +31,8 @@ const rows = parse(fs.readFileSync(path.join(dir, 'data', 'secoes_v.csv')), { co
 const pct = (a, v) => (v ? a / v : null);
 const margem = (l, f, v) => (v ? ((l - f) / v) * 100 : null);
 
-export const PASSOS = [[1, 2], [2, 3], [3, 4], [1, 4]];
+// transições entre listas consecutivas e a comparação direta da primeira com a última
+export const PASSOS = [...IDS.slice(1).map((id, i) => [IDS[i], id]), [IDS[0], ULTIMA]];
 const SITUACOES = { removidas: 'Removidas', mantidas: 'Mantidas', adicionadas: 'Adicionadas' };
 
 const chaveMun = (r) => `${r.uf}:${r.municipio}`;
@@ -98,9 +103,9 @@ export function estados(f = {}) {
   const rs0 = base({ ...f, uf: '' });
   return meta().ufs.filter((uf) => !f.uf || uf === f.uf).map((uf) => {
     const rs = escopo(rs0.filter((r) => r.uf === uf), f), o = { uf };
-    for (const k of [1, 2, 3, 4]) { const s = somar(rs, k); o['el' + k] = s.eleitores; o['m' + k] = s.margem; }
+    for (const k of IDS) { const s = somar(rs, k); o['el' + k] = s.eleitores; o['m' + k] = s.margem; }
     return o;
-  }).filter((o) => o.el1 + o.el2 + o.el3 + o.el4 > 0).sort((a, b) => b.el1 - a.el1);
+  }).filter((o) => IDS.some((k) => o['el' + k] > 0)).sort((a, b) => b.el1 - a.el1);
 }
 
 export function municipios(f) {

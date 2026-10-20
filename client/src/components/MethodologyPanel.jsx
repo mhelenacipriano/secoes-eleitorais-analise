@@ -8,12 +8,12 @@ export default function MethodologyPanel({ meta, listas }) {
       <section className="prose">
         <h2>Como lemos os dados</h2>
         <ul>
-          <li><strong>Este não é um site oficial</strong>, e confirmar o seu local de votação no e-Título é de extrema importância. Foram divulgadas quatro listas datadas (18/10 às 11h, 18/10 às 17h, 19/10 às 11h e 20/10 às 13h59); a mais recente é a de 20/10 às 13h59, disponível no site original do TSE, no <a href="https://sig.tse.jus.br/ords/dwapr/r/seai/sig-eleicao-eleitorado/se%C3%A7%C3%B5es-alteradas" target="_blank" rel="noopener noreferrer">painel Seções alteradas do SIG/TSE</a>.</li>
-          <li>As quatro listas são <strong>retratos diferentes</strong> de seções publicadas como alteradas. Entrar ou sair de uma lista não prova que o local físico de votação mudou.</li>
+          <li><strong>Este não é um site oficial</strong>, e confirmar o seu local de votação no e-Título é de extrema importância. Foram divulgadas várias listas datadas (18/10 às 11h, 18/10 às 17h, 19/10 às 11h, 20/10 às 13h59 e 20/10 às 15h27); a mais recente é a de 20/10 às 15h27 (baixada por nós em 20/10 às 17h46), disponível no site original do TSE, no <a href="https://sig.tse.jus.br/ords/dwapr/r/seai/sig-eleicao-eleitorado/se%C3%A7%C3%B5es-alteradas" target="_blank" rel="noopener noreferrer">painel Seções alteradas do SIG/TSE</a>.</li>
+          <li>As listas são <strong>retratos diferentes</strong> de seções publicadas como alteradas. Entrar ou sair de uma lista não prova que o local físico de votação mudou.</li>
           <li>O perfil de votação é do <strong>1º turno</strong> (histórico). Não é previsão do 2º turno, e os votos do 2º turno (25/10/2026) não estão nestes dados.</li>
           <li><strong>Margem</strong> = % de Lula − % de Flávio Bolsonaro nos votos válidos do 1º turno, em pontos percentuais (pts). A margem de uma lista <em>não</em> é a margem nacional e a variação entre listas <em>não</em> é um “swing” eleitoral.</li>
           <li>Correlação não prova intenção ou causa. Parte das diferenças pode ser <strong>geográfica</strong>: as listas tendem a incluir municípios inteiros.</li>
-          <li>Dados ausentes são mantidos como ausentes. {nInt(meta.semResultado)} seções não têm resultado do 1º turno cruzado (Aracati/CE, Frankfurt e Praga na primeira lista; Ipueiras/CE, Bacuri/MA, Rio Piracicaba, Três Corações e Águas Vermelhas/MG e Vigia/PA entraram na lista de 20/10 · 13h59): contam nos eleitores, ficam fora das porcentagens e nunca viram “zero voto”.</li>
+          <li>Dados ausentes são mantidos como ausentes. {nInt(meta.semResultado)} seções não têm resultado do 1º turno cruzado (Aracati/CE, Frankfurt e Praga na primeira lista; Ipueiras e Santana do Cariri/CE, Bacuri/MA, Inhapim, Rio Piracicaba, Três Corações e Águas Vermelhas/MG, Cuiabá/MT, Santarém e Vigia/PA e Inácio Martins e Irati/PR nas listas de 20/10): contam nos eleitores, ficam fora das porcentagens e nunca viram “zero voto”.</li>
         </ul>
       </section>
       <section className="card">
