@@ -1,0 +1,56 @@
+import { useMemo, useState } from 'react';
+
+/** Tabela com ordenação por clique no título, busca opcional e paginação. */
+export default function DataTable({ columns, rows, initialSort, pageSize = 0, free = false }) {
+  const [sort, setSort] = useState(initialSort || null);
+  const [page, setPage] = useState(0);
+  const sorted = useMemo(() => {
+    if (!sort) return rows;
+    const { key, dir } = sort;
+    return [...rows].sort((a, b) => {
+      const x = a[key], y = b[key];
+      if (x == null) return 1;
+      if (y == null) return -1;
+      return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'pt-BR')) * dir;
+    });
+  }, [rows, sort]);
+  const pages = pageSize ? Math.max(1, Math.ceil(sorted.length / pageSize)) : 1;
+  const p = Math.min(page, pages - 1);
+  const shown = pageSize ? sorted.slice(p * pageSize, (p + 1) * pageSize) : sorted;
+  const click = (key, first) => { setPage(0); setSort((s) => (s && s.key === key ? { key, dir: -s.dir } : { key, dir: first ? 1 : -1 })); };
+
+  if (!rows.length) return <div className="empty">Nenhuma linha para este filtro.</div>;
+  return (
+    <>
+      <div className={'tablewrap' + (free ? ' free' : '')}>
+        <table>
+          <thead>
+            <tr>
+              {columns.map((c, i) => (
+                <th key={c.key} className={c.left ? 'left' : ''} aria-sort={sort && sort.key === c.key ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'}>
+                  <button onClick={() => click(c.key, i === 0)}>{c.label}{sort && sort.key === c.key ? (sort.dir > 0 ? ' ↑' : ' ↓') : ''}</button>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {shown.map((r, i) => (
+              <tr key={i}>
+                {columns.map((c) => (
+                  <td key={c.key} className={(c.left ? 'left ' : '') + (c.wrap ? 'wrap ' : '') + (c.tone ? (r[c.key] == null ? '' : r[c.key] >= 0 ? 'pos' : 'neg') : '')}>{c.format ? c.format(r[c.key]) : r[c.key]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {pageSize > 0 && pages > 1 && (
+        <div className="pager">
+          <span>{p * pageSize + 1}–{Math.min((p + 1) * pageSize, sorted.length)} de {sorted.length.toLocaleString('pt-BR')}</span>
+          <button className="btn" disabled={p === 0} onClick={() => setPage(p - 1)}>Anterior</button>
+          <button className="btn" disabled={p >= pages - 1} onClick={() => setPage(p + 1)}>Próxima</button>
+        </div>
+      )}
+    </>
+  );
+}

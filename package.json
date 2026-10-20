@@ -1,0 +1,19 @@
+{
+  "name": "secoes-alteradas",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Seções eleitorais alteradas no 2º turno de 2026: listas, votos e relatórios",
+  "scripts": {
+    "install:all": "npm install && npm install --prefix client",
+    "dev": "npm run dev:server & npm run dev:client",
+    "dev:server": "node --watch server/index.js",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.6",
+    "express": "^4.19.2"
+  }
+}
