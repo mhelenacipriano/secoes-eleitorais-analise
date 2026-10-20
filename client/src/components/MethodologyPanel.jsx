@@ -8,7 +8,7 @@ export default function MethodologyPanel({ meta, listas }) {
       <section className="prose">
         <h2>Como lemos os dados</h2>
         <ul>
-          <li><strong>Este não é um site oficial</strong>, e confirmar o seu local de votação no e-Título é de extrema importância. Foram divulgadas três versões datadas da lista (18/10 às 11h, 18/10 às 17h e 19/10 às 11h); a lista mais recente, sem data de publicação informada na fonte, vem do <a href="https://sig.tse.jus.br/ords/dwapr/r/seai/sig-eleicao-eleitorado/painel-capilaridade" target="_blank" rel="noopener noreferrer">painel de Capilaridade do SIG/TSE</a>.</li>
+          <li><strong>Este não é um site oficial</strong>, e confirmar o seu local de votação no e-Título é de extrema importância. Foram divulgadas três versões datadas da lista (18/10 às 11h, 18/10 às 17h e 19/10 às 11h); a lista mais recente, sem data de publicação informada na fonte, vem do <a href="https://sig.tse.jus.br/ords/dwapr/r/seai/sig-eleicao-eleitorado/se%C3%A7%C3%B5es-alteradas" target="_blank" rel="noopener noreferrer">painel Seções alteradas do SIG/TSE</a>.</li>
           <li>As quatro listas são <strong>retratos diferentes</strong> de seções publicadas como alteradas. Entrar ou sair de uma lista não prova que o local físico de votação mudou.</li>
           <li>O perfil de votação é do <strong>1º turno</strong> (histórico). Não é previsão do 2º turno, e os votos do 2º turno (25/10/2026) não estão nestes dados.</li>
           <li><strong>Margem</strong> = % de Lula − % de Flávio Bolsonaro nos votos válidos do 1º turno, em pontos percentuais (pts). A margem de uma lista <em>não</em> é a margem nacional e a variação entre listas <em>não</em> é um “swing” eleitoral.</li>

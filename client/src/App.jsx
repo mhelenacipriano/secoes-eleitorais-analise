@@ -9,6 +9,7 @@ import Metodologia from './pages/Metodologia.jsx';
 import Filters from './components/Filters.jsx';
 import { Carregando } from './components/ui.jsx';
 import ThemeToggle from './components/ThemeToggle.jsx';
+import FonteAviso from './components/FonteAviso.jsx';
 import ToTop from './components/ToTop.jsx';
 import { CONSULTA_URL } from './config.js';
 
@@ -37,6 +38,7 @@ export default function App() {
         </nav>
       </div>
       <main id="conteudo">
+        <FonteAviso />
         {!meta.data ? <Carregando state={meta} /> : (
           <>
             {(pagina === 'evolucao' || pagina === 'impacto') && <Filters meta={meta.data} filtros={filtros} setFiltros={setFiltros} usa={{}} />}
