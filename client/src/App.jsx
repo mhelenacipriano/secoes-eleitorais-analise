@@ -1,50 +1,50 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useApi } from './api.js';
+import { useRota } from './router.js';
+import Home from './pages/Home.jsx';
+import Evolucao from './pages/Evolucao.jsx';
+import Impacto from './pages/Impacto.jsx';
+import Explorar from './pages/Explorar.jsx';
+import Metodologia from './pages/Metodologia.jsx';
 import Filters from './components/Filters.jsx';
-import Visao from './pages/Visao.jsx';
-import Mudancas from './pages/Mudancas.jsx';
-import Estados from './pages/Estados.jsx';
-import Municipios from './pages/Municipios.jsx';
-import Secoes from './pages/Secoes.jsx';
-import Listas from './pages/Listas.jsx';
+import { Carregando } from './components/ui.jsx';
 
-const PAGINAS = [
-  ['visao', 'Visão geral'], ['mudancas', 'Mudanças entre listas'], ['estados', 'Estados'],
-  ['municipios', 'Municípios'], ['secoes', 'Seções'], ['listas', 'Listas e relatórios'],
-];
-const pegaPagina = () => { const h = location.hash.slice(1); return PAGINAS.some(([id]) => id === h) ? h : 'visao'; };
+const NAV = [['', 'Visão geral'], ['evolucao', 'Evolução das listas'], ['impacto', 'Impacto potencial'], ['explorar', 'Explorar dados'], ['metodologia', 'Metodologia e fontes']];
 
 export default function App() {
-  const [pagina, setPagina] = useState(pegaPagina);
-  const [filtros, setFiltros] = useState({ uf: '', lista: '', vantagem: '' });
+  const { caminho, filtros, ir } = useRota();
+  const [menu, setMenu] = useState(false);
   const meta = useApi('meta');
-  useEffect(() => {
-    const on = () => setPagina(pegaPagina());
-    window.addEventListener('hashchange', on);
-    return () => window.removeEventListener('hashchange', on);
-  }, []);
-  const ir = (id) => { location.hash = id; window.scrollTo({ top: 0 }); };
+  const [raiz, sub] = caminho.split('/');
+  const pagina = NAV.some(([id]) => id === raiz) ? raiz : '';
+  const setFiltros = (f) => ir(caminho, f, { topo: false });
+  const vai = (id) => { setMenu(false); ir(id, id === 'evolucao' || id === 'impacto' ? filtros : {}); };
 
   return (
     <div className="app">
-      <header className="topbar">
-        <span className="eyebrow">Eleições 2026 · Presidente · 2º turno em 25/10</span>
-        <h1>Seções eleitorais alteradas</h1>
-      </header>
-      <nav className="nav" aria-label="Seções do site">
-        {PAGINAS.map(([id, nome]) => <button key={id} aria-current={pagina === id ? 'page' : undefined} onClick={() => ir(id)}>{nome}</button>)}
-      </nav>
-      {!meta.data ? <div className="spinner">Carregando…</div> : (
-        <>
-          {pagina !== 'listas' && <Filters meta={meta.data} filtros={filtros} setFiltros={setFiltros} pagina={pagina} />}
-          {pagina === 'visao' && <Visao filtros={filtros} />}
-          {pagina === 'mudancas' && <Mudancas filtros={filtros} />}
-          {pagina === 'estados' && <Estados filtros={filtros} />}
-          {pagina === 'municipios' && <Municipios filtros={filtros} />}
-          {pagina === 'secoes' && <Secoes filtros={filtros} />}
-          {pagina === 'listas' && <Listas meta={meta.data} />}
-        </>
-      )}
+      <a className="skip" href="#conteudo">Ir para o conteúdo</a>
+      <div className="topbar">
+        <button className="brand" onClick={() => vai('')}>Seções eleitorais · 2º turno 2026</button>
+        <button className="menu-btn" aria-expanded={menu} aria-controls="nav" onClick={() => setMenu((m) => !m)}>{menu ? 'Fechar' : 'Menu'}</button>
+        <nav id="nav" className={'nav' + (menu ? ' open' : '')} aria-label="Seções do site">
+          {NAV.map(([id, nome]) => <button key={id} aria-current={pagina === id ? 'page' : undefined} onClick={() => vai(id)}>{nome}</button>)}
+        </nav>
+      </div>
+      <main id="conteudo">
+        {!meta.data ? <Carregando state={meta} /> : (
+          <>
+            {(pagina === 'evolucao' || pagina === 'impacto') && <Filters meta={meta.data} filtros={filtros} setFiltros={setFiltros} usa={{}} />}
+            {pagina === '' && <Home ir={ir} />}
+            {pagina === 'evolucao' && <Evolucao filtros={filtros} />}
+            {pagina === 'impacto' && <Impacto filtros={filtros} />}
+            {pagina === 'explorar' && <Explorar sub={sub} meta={meta.data} filtros={filtros} setFiltros={setFiltros} ir={ir} />}
+            {pagina === 'metodologia' && <Metodologia meta={meta.data} />}
+          </>
+        )}
+      </main>
+      <footer className="foot">
+        <p>Os dados mostram o perfil eleitoral das seções, não comprovam mudanças no resultado da eleição. Fonte: listas de seções alteradas e resultados do 1º turno de 2026 (CSV do projeto). Este site não sugere fraude nem interferência.</p>
+      </footer>
     </div>
   );
 }

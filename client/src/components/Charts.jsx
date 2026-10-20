@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { nPct, nPts, nInt } from '../format.js';
+import { nPts, nInt } from '../format.js';
 
 export const COR = { lula: 'var(--lula)', flavio: 'var(--flavio)', neutro: 'var(--neutro)' };
 
-function useWidth() {
+export function useWidth() {
   const ref = useRef(null);
   const [w, setW] = useState(600);
   useEffect(() => {
@@ -26,41 +26,13 @@ function useTip() {
 }
 
 const Tip = ({ tip }) => tip && <div className="tip" style={{ left: Math.max(4, tip.x), top: tip.y }}>{tip.lines.map((l, i) => <div key={i} className={i ? '' : 'strong'}>{l}</div>)}</div>;
+export const Hachura = () => (
+  <defs>
+    <pattern id="hachF" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="var(--flavio)" /><rect width="2.2" height="6" fill="var(--hachura)" /></pattern>
+  </defs>
+);
 const Empty = () => <div className="empty">Sem dados para este filtro.</div>;
 const textW = (s, px = 6.2) => s.length * px;
-
-/** Colunas agrupadas: Lula, Flávio e Outros em cada lista. */
-export function BarrasPorLista({ listas }) {
-  const [ref, w] = useWidth();
-  const [box, tip, on, off] = useTip();
-  if (!listas.length) return <Empty />;
-  const H = 270, top = 26, bot = 48, band = (w - 16) / listas.length, gw = band * 0.78, bw = gw / 3;
-  const max = Math.max(...listas.map((l) => Math.max(l.lulaPct, l.flavioPct, l.outrosPct))) * 1.1;
-  const y = (v) => H - bot - (v / max) * (H - bot - top);
-  return (
-    <div className="chart" ref={(el) => { ref.current = el; box.current = el; }}>
-      <svg width="100%" viewBox={`0 0 ${w} ${H}`} role="img" aria-label="Porcentagem de votos por lista">
-        {listas.map((l, i) => {
-          const x0 = 8 + i * band + (band - gw) / 2;
-          return (
-            <g key={l.id} onMouseMove={on([l.nome, `Lula ${nPct(l.lulaPct)} · Flávio ${nPct(l.flavioPct)}`, `Margem ${nPts(l.margem)}`, `${nInt(l.eleitores)} eleitores`])} onMouseLeave={off}>
-              <rect x={8 + i * band} y={0} width={band} height={H} fill="transparent" />
-              {[['lulaPct', COR.lula], ['flavioPct', COR.flavio], ['outrosPct', COR.neutro]].map(([k, c], j) => (
-                <g key={k}>
-                  <rect x={x0 + j * bw} y={y(l[k])} width={bw - 3} height={H - bot - y(l[k])} rx="3" fill={c} />
-                  <text x={x0 + j * bw + (bw - 3) / 2} y={y(l[k]) - 6} textAnchor="middle">{nPct(l[k])}</text>
-                </g>
-              ))}
-              <text x={8 + i * band + band / 2} y={H - bot + 18} textAnchor="middle" className="strong">{l.label}</text>
-              <text x={8 + i * band + band / 2} y={H - bot + 33} textAnchor="middle">{nInt(l.secoes)} seções</text>
-            </g>
-          );
-        })}
-      </svg>
-      <Tip tip={tip} />
-    </div>
-  );
-}
 
 /** Barras horizontais com valor positivo (Lula) à direita e negativo (Flávio) à esquerda. */
 export function BarrasMargem({ itens, rotuloLargura }) {
@@ -74,13 +46,14 @@ export function BarrasMargem({ itens, rotuloLargura }) {
   return (
     <div className="chart" ref={(el) => { ref.current = el; box.current = el; }}>
       <svg width="100%" viewBox={`0 0 ${w} ${H}`} role="img" aria-label="Margem Lula menos Flávio">
+        <Hachura />
         {itens.map((it, i) => {
           const y = 4 + i * rowH, pos = it.valor >= 0, x0 = x(0), x1 = x(it.valor);
           return (
             <g key={it.rotulo} onMouseMove={on([it.rotulo, ...(it.dica || [])])} onMouseLeave={off}>
               <rect x="0" y={y} width={w} height={rowH} fill="transparent" />
               <text x={left - 8} y={y + 17} textAnchor="end" className="strong">{it.rotulo}</text>
-              <rect x={Math.min(x0, x1)} y={y + 5} width={Math.max(2, Math.abs(x1 - x0))} height="15" rx="3" fill={pos ? COR.lula : COR.flavio} />
+              <rect x={Math.min(x0, x1)} y={y + 5} width={Math.max(2, Math.abs(x1 - x0))} height="15" rx="3" fill={pos ? COR.lula : 'url(#hachF)'} />
               <text x={pos ? x1 + 5 : x1 - 5} y={y + 17} textAnchor={pos ? 'start' : 'end'}>{nPts(it.valor)}</text>
             </g>
           );
@@ -114,7 +87,7 @@ export function Halteres({ estados }) {
               <text x="0" y={y + 4} className="strong">{e.uf}</text>
               <line x1={x(e.m1)} x2={x(e.m4)} y1={y} y2={y} stroke="var(--neutro)" strokeWidth="2" />
               <circle cx={x(e.m1)} cy={y} r="5" fill="var(--neutro)" />
-              <circle cx={x(e.m4)} cy={y} r="5" fill={COR.lula} />
+              <circle cx={x(e.m4)} cy={y} r="5" fill="var(--fg)" />
             </g>
           );
         })}
@@ -124,4 +97,3 @@ export function Halteres({ estados }) {
   );
 }
 
-export const Legenda = ({ itens }) => <div className="legend">{itens.map(([c, t]) => <span key={t}><i style={{ background: c }} />{t}</span>)}</div>;

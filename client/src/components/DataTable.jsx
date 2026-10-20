@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
+import { InfoTip } from './ui.jsx';
 
 /** Tabela com ordenação por clique no título, busca opcional e paginação. */
-export default function DataTable({ columns, rows, initialSort, pageSize = 0, free = false }) {
+export default function DataTable({ columns, rows, initialSort, pageSize = 0, free = false, vazio = 'Nenhuma linha para este filtro.' }) {
   const [sort, setSort] = useState(initialSort || null);
   const [page, setPage] = useState(0);
   const sorted = useMemo(() => {
@@ -19,7 +20,7 @@ export default function DataTable({ columns, rows, initialSort, pageSize = 0, fr
   const shown = pageSize ? sorted.slice(p * pageSize, (p + 1) * pageSize) : sorted;
   const click = (key, first) => { setPage(0); setSort((s) => (s && s.key === key ? { key, dir: -s.dir } : { key, dir: first ? 1 : -1 })); };
 
-  if (!rows.length) return <div className="empty">Nenhuma linha para este filtro.</div>;
+  if (!rows.length) return <div className="empty">{vazio}</div>;
   return (
     <>
       <div className={'tablewrap' + (free ? ' free' : '')}>
@@ -28,7 +29,7 @@ export default function DataTable({ columns, rows, initialSort, pageSize = 0, fr
             <tr>
               {columns.map((c, i) => (
                 <th key={c.key} className={c.left ? 'left' : ''} aria-sort={sort && sort.key === c.key ? (sort.dir > 0 ? 'ascending' : 'descending') : 'none'}>
-                  <button onClick={() => click(c.key, i === 0)}>{c.label}{sort && sort.key === c.key ? (sort.dir > 0 ? ' ↑' : ' ↓') : ''}</button>
+                  <button onClick={() => click(c.key, i === 0)}>{c.label}{sort && sort.key === c.key ? (sort.dir > 0 ? ' ↑' : ' ↓') : ''}</button>{c.hint && <InfoTip texto={c.hint} rotulo={`O que significa ${c.label}`} />}
                 </th>
               ))}
             </tr>

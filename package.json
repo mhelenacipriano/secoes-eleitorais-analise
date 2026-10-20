@@ -10,7 +10,8 @@
     "dev:server": "node --watch server/index.js",
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "verificar": "node scripts/verificar.mjs"
   },
   "dependencies": {
     "csv-parse": "^5.5.6",

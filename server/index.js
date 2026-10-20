@@ -2,11 +2,17 @@ import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { meta, resumo, mudancas, estados, municipios, secoes } from './data.js';
+import { meta, resumo, mudancas, estados, municipios, secoes, historia } from './data.js';
 
 const app = express();
 const dir = path.dirname(fileURLToPath(import.meta.url));
-const q = (req) => ({ uf: String(req.query.uf || ''), lista: Number(req.query.lista) || 0, vantagem: String(req.query.vantagem || ''), q: String(req.query.q || '') });
+// Filtros globais: estado, município ("UF:NOME"), lista, transição ("1-2"), líder no 1º turno (L/F) e situação.
+const oneOf = (v, ok) => (ok.includes(String(v)) ? String(v) : '');
+const q = (req) => ({
+  uf: String(req.query.uf || ''), municipio: String(req.query.municipio || ''), lista: Number(req.query.lista) || 0,
+  transicao: oneOf(req.query.transicao, ['1-2', '2-3', '3-4', '1-4']), status: oneOf(req.query.status, ['removidas', 'mantidas', 'adicionadas']),
+  lider: oneOf(req.query.lider || req.query.vantagem, ['L', 'F']), q: String(req.query.q || ''),
+});
 
 function csv(res, nome, linhas) {
   if (!linhas.length) return res.status(204).end();
@@ -21,11 +27,12 @@ const sendOrCsv = (nome, fn) => (req, res) => {
 };
 
 app.get('/api/meta', (_req, res) => res.json(meta()));
-app.get('/api/resumo', sendOrCsv('resumo-por-lista', ({ uf }) => resumo(uf)));
-app.get('/api/mudancas', sendOrCsv('mudancas-entre-listas', ({ uf }) => mudancas(uf)));
-app.get('/api/estados', sendOrCsv('estados', () => estados()));
+app.get('/api/resumo', sendOrCsv('resumo-por-lista', resumo));
+app.get('/api/mudancas', sendOrCsv('mudancas-entre-listas', mudancas));
+app.get('/api/estados', sendOrCsv('estados', estados));
 app.get('/api/municipios', sendOrCsv('municipios', municipios));
 app.get('/api/secoes', sendOrCsv('secoes', secoes));
+app.get('/api/historia', (req, res) => res.json(historia(q(req))));
 
 const dist = path.join(dir, '..', 'client', 'dist');
 if (fs.existsSync(dist)) {
