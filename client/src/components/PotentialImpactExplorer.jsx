@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useParam, useParamNum } from '../router.js';
 import { nInt, nPct } from '../format.js';
 import { InfoTip } from './ui.jsx';
 
@@ -6,14 +7,16 @@ const dois = (l) => (l.lula + l.flavio ? l.lula / (l.lula + l.flavio) : 0.5);
 
 /** Simulação didática: mostra a ordem de grandeza sob premissas explícitas. Nada aqui é previsão. */
 export default function PotentialImpactExplorer({ listas }) {
-  const [id, setId] = useState(listas[listas.length - 1].id);
+  const [id, setId] = useParamNum('il', listas[listas.length - 1].id);
   const l = listas.find((x) => x.id === id) || listas[0];
   const observado = Math.round(dois(l) * 100);
   const compObs = l.aptosComResultado ? Math.round((l.validos / l.aptosComResultado) * 100) : 75;
-  const [imp, setImp] = useState(10);
-  const [pref, setPref] = useState(null);
-  const [comp, setComp] = useState(null);
-  const [nac, setNac] = useState('');
+  // as premissas do cenário ficam na URL (il = lista, imp, pref, comp, nac); pref e comp vazios = usar o perfil observado
+  const [imp, setImp] = useParamNum('imp', 10);
+  const [prefP, setPrefP] = useParam('pref'), [compP, setCompP] = useParam('comp');
+  const pref = prefP === '' || !Number.isFinite(Number(prefP)) ? null : Number(prefP), setPref = (v) => setPrefP(v == null ? '' : v);
+  const comp = compP === '' || !Number.isFinite(Number(compP)) ? null : Number(compP), setComp = (v) => setCompP(v == null ? '' : v);
+  const [nac, setNac] = useParam('nac');
   const prefEf = pref ?? observado, compEf = comp ?? compObs;
 
   const r = useMemo(() => {

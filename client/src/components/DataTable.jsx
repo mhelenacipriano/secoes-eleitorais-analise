@@ -1,10 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
+import { useParam, useParamNum } from '../router.js';
 import { InfoTip } from './ui.jsx';
 
 /** Tabela com ordenação por clique no título, busca opcional e paginação. */
-export default function DataTable({ columns, rows, initialSort, pageSize = 0, free = false, vazio = 'Nenhuma linha para este filtro.' }) {
-  const [sort, setSort] = useState(initialSort || null);
-  const [page, setPage] = useState(0);
+export default function DataTable({ columns, rows, initialSort, pageSize = 0, free = false, vazio = 'Nenhuma linha para este filtro.', chave = 't' }) {
+  // ordenação e página ficam na URL (chave+o = coluna, chave+d = sentido, chave+p = página), para o link reproduzir a tabela
+  const [oKey, setOKey] = useParam(chave + 'o', initialSort?.key || '');
+  const [oDir, setODir] = useParamNum(chave + 'd', initialSort?.dir || 1);
+  const [pagina, setPagina] = useParamNum(chave + 'p', 1);
+  const sort = oKey && columns.some((c) => c.key === oKey) ? { key: oKey, dir: oDir < 0 ? -1 : 1 } : initialSort || null;
+  const page = Math.max(0, pagina - 1);
+  const setPage = (n) => setPagina(n + 1);
   const sorted = useMemo(() => {
     if (!sort) return rows;
     const { key, dir } = sort;
@@ -18,7 +24,7 @@ export default function DataTable({ columns, rows, initialSort, pageSize = 0, fr
   const pages = pageSize ? Math.max(1, Math.ceil(sorted.length / pageSize)) : 1;
   const p = Math.min(page, pages - 1);
   const shown = pageSize ? sorted.slice(p * pageSize, (p + 1) * pageSize) : sorted;
-  const click = (key, first) => { setPage(0); setSort((s) => (s && s.key === key ? { key, dir: -s.dir } : { key, dir: first ? 1 : -1 })); };
+  const click = (key, first) => { const dir = sort && sort.key === key ? -sort.dir : first ? 1 : -1; setPagina(1); setOKey(key); setODir(dir); };
 
   if (!rows.length) return <div className="empty">{vazio}</div>;
   return (

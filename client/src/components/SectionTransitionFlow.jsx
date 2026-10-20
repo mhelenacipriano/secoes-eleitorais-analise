@@ -8,7 +8,7 @@ const NOTA = 'Estas são mudanças nas listas publicadas. Uma seção que sai de
 /** Fluxo entre versões consecutivas: o que ficou, o que saiu e o que entrou. */
 export default function SectionTransitionFlow({ listas, transicoes }) {
   const [ref, w] = useWidth();
-  const [foco, setFoco] = useState(null);
+  const [foco, setFoco] = useState(null);   // só o destaque ao passar o mouse: não vai para a URL
   const seq = transicoes.filter((t) => t.ate === t.de + 1);
   const cols = listas;
   const colW = 16, topo = 34, H = 330, baixo = 40, desce = 38;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useParam } from '../router.js';
 import { useApi } from '../api.js';
 import { nInt, nPct, nPts } from '../format.js';
 import { H } from '../hints.js';
@@ -6,7 +6,7 @@ import DataTable from '../components/DataTable.jsx';
 import { Baixar, Card, Carregando } from '../components/ui.jsx';
 
 export default function Secoes({ filtros, comSituacao = false }) {
-  const [q, setQ] = useState('');
+  const [q, setQ] = useParam('q');
   const params = { uf: filtros.uf, municipio: filtros.municipio, lista: filtros.lista, transicao: filtros.transicao, status: filtros.status, lider: filtros.lider, q };
   const st = useApi('secoes', params);
   const cols = [

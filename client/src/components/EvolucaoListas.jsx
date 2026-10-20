@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useParamNum } from '../router.js';
 import { nInt, nPts } from '../format.js';
 import VersionTimeline from './VersionTimeline.jsx';
 import VersionComparison from './VersionComparison.jsx';
 
 export default function EvolucaoListas({ listas, transicoes }) {
-  const [sel, setSel] = useState(listas[0].id);
+  const [sel, setSel] = useParamNum('lst', listas[0].id);
   const ids = listas.map((l) => l.id);
   const i = Math.max(0, ids.indexOf(sel));
   const l = listas[i];

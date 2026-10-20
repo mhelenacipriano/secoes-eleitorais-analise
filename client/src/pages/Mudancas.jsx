@@ -20,14 +20,14 @@ export default function Mudancas({ filtros }) {
         <BarrasMargem itens={itens} />
       </Card>
       <Recolhivel titulo="Efeito sobre a margem da lista" nota="Margem da lista antes e depois de cada troca (variação de composição, não swing eleitoral)">
-        <DataTable free columns={[
+        <DataTable free chave="a" columns={[
           { key: 'passo', label: 'Troca', left: true }, { key: 'antes', label: 'Margem antes', format: nPts, tone: true, hint: H.margem }, { key: 'depois', label: 'Margem depois', format: nPts, tone: true, hint: H.margem },
           { key: 'variacao', label: 'Variação', format: nPts, hint: 'Diferença, em pontos percentuais, entre a margem da lista nova e a da lista anterior. Não é uma mudança de votos nem um swing eleitoral.' },
           { key: 'lula', label: 'Votos Lula', format: nSig }, { key: 'flavio', label: 'Votos Flávio', format: nSig },
         ]} rows={efeito} />
       </Recolhivel>
       <Recolhivel titulo="Detalhe de cada troca" nota="Seções removidas, mantidas e adicionadas" acoes={<Baixar path="mudancas" params={p} />}>
-        <DataTable columns={[
+        <DataTable chave="b" columns={[
           { key: 'passo', label: 'Troca', left: true }, { key: 'situacao', label: 'Situação', left: true }, { key: 'secoes', label: 'Seções', format: nInt },
           { key: 'semResultado', label: 'Sem resultado', format: nInt, hint: 'Seções sem resultado do 1º turno cruzado. Ficam fora das porcentagens.' },
           { key: 'eleitores', label: 'Eleitores', format: nInt, hint: H.eleitores }, { key: 'lulaPct', label: 'Lula', format: nPct, hint: H.pct }, { key: 'flavioPct', label: 'Flávio', format: nPct, hint: H.pct }, { key: 'margem', label: 'Margem', format: nPts, tone: true, hint: H.margem },

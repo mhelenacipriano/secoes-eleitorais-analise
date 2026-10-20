@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useParam } from '../router.js';
 import { favorece, nInt, nPct, nPts, quem } from '../format.js';
 import { BarraCandidatos, InfoTip, Legenda } from './ui.jsx';
 
@@ -36,7 +36,7 @@ function Controle({ c }) {
 }
 
 export default function ElectoralProfileComparison({ transicoes }) {
-  const [id, setId] = useState('1-2');
+  const [id, setId] = useParam('cmp', '1-2');
   const t = transicoes.find((x) => x.id === id) || transicoes[0];
   const geral = padraoGeral(transicoes);
   return (
