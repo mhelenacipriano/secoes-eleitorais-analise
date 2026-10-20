@@ -83,7 +83,7 @@ button, select, input { font: inherit; color: inherit; }
 .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .tl-item { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-rows: 90px auto auto auto; gap: 4px; padding: 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); transition: border-color .25s, background .25s, transform .25s; min-height: 44px; }
 .tl-item:hover { border-color: var(--neutro); }
-.tl-item.ativa { border-color: var(--red-solid); background: var(--panel2); transform: translateY(-3px); }
+.tl-item.ativa { border-color: var(--red-solid); background: var(--panel2); }
 .tl-item.ultima { border-style: dashed; }
 .tl-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tl-col { display: flex; align-items: flex-end; } .tl-col i { display: block; width: 100%; background: var(--neutro); border-radius: 6px 6px 2px 2px; transition: height .6s ease, background .25s; }
@@ -276,16 +276,12 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
 }
 @media (hover: hover) and (pointer: fine) {
   .nav button:hover::after { transform: scaleX(1); } .nav button[aria-current="page"]::after { display: none; }
-  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .45); }
-  .btn.primary:hover:not(:disabled) { box-shadow: 0 12px 24px -12px color-mix(in srgb, var(--red-solid) 80%, transparent); }
-  .theme-btn:hover { box-shadow: 0 6px 14px -8px rgba(0, 0, 0, .4); }
   .card:hover, .coluna:hover, .grupo:hover, .flow-lista li:hover, .keyfacts > div:hover, .collapse:hover { border-color: color-mix(in srgb, var(--red-solid) 34%, var(--line)); }
-  .card:hover, .coluna:hover, .grupo:hover, .flow-lista li:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -20px rgba(0, 0, 0, .55); }
-  .conceitos > div:hover { transform: translateY(-2px); border-top-color: var(--red-solid); }
-  .tl-item:hover:not(.ativa) { transform: translateY(-3px); border-color: var(--red-solid); } .tl-item:hover .tl-col i { filter: brightness(1.12); }
+  .conceitos > div:hover { border-top-color: var(--red-solid); }
+  .tl-item:hover:not(.ativa) { border-color: var(--red-solid); } .tl-item:hover .tl-col i { filter: brightness(1.12); }
   tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--red-solid); }
   .banner a:hover, .prose a:hover { background-size: 0 1px; background-position: 100% 100%; }
   .collapse summary:hover { color: var(--red-solid); }
-  .totop:hover { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgba(0, 0, 0, .5); } .totop { transition: transform .2s ease, box-shadow .2s ease; }
+  .totop:hover { border-color: var(--red-solid); }
 }
 @media (prefers-reduced-motion: reduce) { .pagina-anim, .pagina-anim > *, .banner, .aviso-obra { animation: none !important; } .nav button::after { transition: none; } }
