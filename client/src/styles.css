@@ -234,3 +234,5 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
 
 .foot .legal { margin-top: 4px; padding-top: 16px; border-top: 1px solid var(--line); font-size: .8rem; line-height: 1.55; color: var(--muted); max-width: 72ch; } .foot .legal strong { color: var(--fg2); }
 .prose a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.foot .legal { max-width: none; width: 100%; align-self: stretch; justify-self: stretch; font-size: .72rem; line-height: 1.5; }
+.foot { max-width: none; }
