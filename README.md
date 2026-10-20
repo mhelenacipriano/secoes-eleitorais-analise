@@ -43,16 +43,3 @@ O front-end (Vite) vira site estático e a API Express roda como função (`api/
 1. Importe o repositório em vercel.com/new (Framework: Other; não mude os comandos, eles vêm do `vercel.json`).
 2. Opcional: defina `VITE_CONSULTA_URL` (endereço da página de consulta) em Settings → Environment Variables para mostrar o link no rodapé.
 3. Deploy. Cada push na branch de produção publica de novo.
-
-## Contador de acessos (página escondida)
-
-Contagem anônima (sem cookies, sem IP, sem dados pessoais): acessos no total, por dia e quem está no site agora. Só você vê, em `/#estatisticas`, com uma senha.
-
-Como ligar na Vercel:
-
-1. No projeto da Vercel: **Storage → Create Database → Upstash (Redis)** (plano gratuito) e **Connect Project**. Isso cria as variáveis `KV_REST_API_URL` e `KV_REST_API_TOKEN` (ou `UPSTASH_REDIS_REST_URL`/`TOKEN`).
-2. **Settings → Environment Variables**: crie `STATS_TOKEN` com a senha que você quiser (Production).
-3. Faça um novo deploy (Deployments → ⋯ → Redeploy).
-4. Abra `https://SEU-SITE/#estatisticas` e entre com a senha.
-
-Sem essas variáveis o site funciona normalmente e o contador fica desligado. Não conta em desenvolvimento nem na própria página de estatísticas. Código: `api/` (funções), `client/src/contador.js` (envio) e `client/src/Estatisticas.jsx` (painel).
