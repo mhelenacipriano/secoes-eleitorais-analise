@@ -292,3 +292,16 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
 .chart g.lig.on circle { r: 7; } .chart g.lig.on rect:not([fill="transparent"]) { stroke: var(--fg); stroke-width: 1.5; }
 tbody tr.hl td { background: var(--soft); } tbody tr.hl td:first-child { box-shadow: inset 3px 0 0 var(--red-solid); }
 @media (prefers-reduced-motion: reduce) { .chart g.lig { transition: none; } }
+
+/* filtro por intervalo (histogramas com seleção por arraste) */
+.intervalos { display: grid; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+.intervalos-cab { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; } .intervalos-cab .note { margin: 0; } .intervalos-acoes { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.intervalos-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } @media (max-width: 700px) { .intervalos-grade { grid-template-columns: 1fr; } }
+.intervalos h3 { margin: 0 0 4px; font-size: .9rem; } .intervalos .note { margin: 2px 0 0; }
+.hist svg { display: block; width: 100%; height: auto; cursor: crosshair; user-select: none; } .hist text { fill: var(--muted); font-size: 10px; }
+.hist .hb { fill: var(--neutro); transition: fill .15s ease; } .hist .hb.fora { fill: var(--line); }
+.hist .sel-brush { fill: color-mix(in srgb, var(--red-solid) 18%, transparent); stroke: var(--red-solid); stroke-width: 1.2; pointer-events: none; }
+.intervalos-num { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .88rem; } .intervalos-num label { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.intervalos-num input { width: 5.5rem; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); font: inherit; }
+.intervalos-res { margin: 0; font-size: .88rem; color: var(--fg2); }
+@media print { .intervalos { display: none; } }

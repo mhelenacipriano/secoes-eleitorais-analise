@@ -3,12 +3,14 @@ import { useApi } from '../api.js';
 import { nInt, nPct, nPts } from '../format.js';
 import { H } from '../hints.js';
 import DataTable from '../components/DataTable.jsx';
+import { useIntervalos } from '../components/Intervalos.jsx';
 import { Baixar, Card, Carregando } from '../components/ui.jsx';
 
 export default function Secoes({ filtros, comSituacao = false }) {
   const [q, setQ] = useParam('q');
   const params = { uf: filtros.uf, municipio: filtros.municipio, lista: filtros.lista, transicao: filtros.transicao, status: filtros.status, lider: filtros.lider, q };
   const st = useApi('secoes', params);
+  const [linhas, painel] = useIntervalos(st.data || []);
   const cols = [
     { key: 'secao', label: 'Seção', left: true }, { key: 'localInicial', label: 'Local inicial', left: true, wrap: true }, { key: 'localFinal', label: 'Local final', left: true, wrap: true },
     { key: 'listas', label: 'Aparece em', left: true, wrap: true },
@@ -19,8 +21,9 @@ export default function Secoes({ filtros, comSituacao = false }) {
   ];
   return (
     <Card titulo="Seção por seção" nota="Local de origem, local de destino e votos do 1º turno de cada seção alterada." acoes={<Baixar path="secoes" params={params} />}>
-      <div className="tools"><input className="search" type="search" placeholder="Buscar município, estado ou local" aria-label="Buscar seção" value={q} onChange={(e) => setQ(e.target.value)} />{st.data && <span className="note">{nInt(st.data.length)} seções</span>}</div>
-      {st.data ? <DataTable pageSize={50} vazio="Nenhuma seção corresponde aos filtros ou à busca." initialSort={{ key: 'eleitores', dir: -1 }} columns={cols} rows={st.data} /> : <Carregando state={st} />}
+      {painel}
+      <div className="tools"><input className="search" type="search" placeholder="Buscar município, estado ou local" aria-label="Buscar seção" value={q} onChange={(e) => setQ(e.target.value)} />{st.data && <span className="note">{nInt(linhas.length)} seções</span>}</div>
+      {st.data ? <DataTable pageSize={50} vazio="Nenhuma seção corresponde aos filtros ou à busca." initialSort={{ key: 'eleitores', dir: -1 }} columns={cols} rows={linhas} /> : <Carregando state={st} />}
     </Card>
   );
 }
