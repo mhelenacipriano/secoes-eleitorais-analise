@@ -33,6 +33,8 @@ export default function MethodologyPanel({ meta, listas }) {
         <h2>Limites desta análise</h2>
         <ul>
           <li>Não sabemos por que cada registro foi adicionado ou removido, nem se algum eleitor deixou de votar.</li>
+          <li>Seções que saíram de uma lista em uma atualização podem ter mantido a mudança de local, tê-la desfeita ou tido o registro corrigido. Não conseguimos confirmar o que aconteceu em cada caso, e não encontramos publicação oficial que o esclareça.</li>
+          <li>As listas aqui analisadas podem estar incompletas ou desatualizadas: elas não substituem a consulta oficial do local de votação. Para saber o local atual, use o aplicativo e-Título, o Autoatendimento Eleitoral do TSE ou o site do TRE do seu estado.</li>
           <li>O controle por município tem amostra pequena: poucos municípios têm, ao mesmo tempo, seções retiradas e adicionadas.</li>
           <li>Não há totais nacionais verificados nos dados; por isso o cenário hipotético não indica vencedor.</li>
           <li>Esta página não sugere fraude, interferência política ou manipulação intencional — nenhuma evidência disso é apresentada.</li>

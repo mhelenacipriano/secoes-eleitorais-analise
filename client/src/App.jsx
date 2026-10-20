@@ -51,6 +51,7 @@ export default function App() {
       <footer className="foot">
         {CONSULTA_URL && <a className="btn" href={CONSULTA_URL}>Consulte a sua seção →</a>}
         <p>Os dados mostram o perfil eleitoral das seções, não comprovam mudanças no resultado da eleição. Fonte: listas de seções alteradas e resultados do 1º turno de 2026 (CSV do projeto). Este site não sugere fraude nem interferência.</p>
+        <p className="note">Para saber o local de votação atual, confirme no aplicativo e-Título ou no Autoatendimento Eleitoral do TSE: as listas analisadas aqui podem estar incompletas ou desatualizadas.</p>
       </footer>
       <ToTop />
     </div>
