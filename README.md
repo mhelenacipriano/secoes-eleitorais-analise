@@ -14,6 +14,10 @@ npm start       # http://localhost:3001
 npm run verificar   # recalcula tudo do CSV e compara com a API
 ```
 
+## Dados
+
+`server/data/secoes_v.csv` consolida as quatro listas e os votos do 1º turno. A lista mais recente (438 seções) vem de `server/data/fontes/secoes_eleitorais_alteradas_2t-regiao_2026.csv` e é aplicada com `node scripts/aplicar-lista-recente.mjs <csv>` (confere que são as mesmas seções e atualiza os locais de votação).
+
 ## Navegação
 
 Visão geral (narrativa) · Evolução das listas · Impacto potencial · Explorar dados (estados, municípios, seções, adicionadas/removidas/mantidas) · Metodologia e fontes (PDFs em `/relatorios`).
