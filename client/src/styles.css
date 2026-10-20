@@ -315,3 +315,9 @@ tbody tr.hl td { background: var(--soft); } tbody tr.hl td:first-child { box-sha
 .faixa-central { position: absolute; top: 2px; bottom: 2px; width: 4px; margin-left: -2px; border-radius: 2px; background: var(--fg); transition: left .2s ease; }
 .faixa-eixo { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); } .faixa .note { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .faixa-intervalo, .faixa-central { transition: none; } }
+
+/* comparar municípios */
+.comp-selecao { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; } @media (max-width: 700px) { .comp-selecao { grid-template-columns: 1fr; } }
+.comp-sel { display: grid; gap: 6px; font-size: .92rem; } .comp-sel select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--fg); min-height: 44px; font: inherit; }
+.comp-frase { margin: 0 0 12px; line-height: 1.55; }
+.comp-tab td, .comp-tab th { text-align: right; } .comp-tab td.left, .comp-tab th.left { text-align: left; }
