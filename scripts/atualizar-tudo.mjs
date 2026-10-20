@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 const raiz = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const semPush = args.includes('--sem-push'), forcar = args.includes('--forcar');
-const sh = (cmd, a, cwd, opc = {}) => execFileSync(cmd, a, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'], ...opc }).trim();
+const sh = (cmd, a, cwd, opc = {}) => { const r = execFileSync(cmd, a, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'], ...opc }); return r ? r.trim() : ''; };   // com stdio 'inherit' o retorno é nulo
 const log = (m) => console.log(`[${new Date().toISOString()}] ${m}`);
 
 let origem = args.includes('--url') ? args[args.indexOf('--url') + 1] : null;
