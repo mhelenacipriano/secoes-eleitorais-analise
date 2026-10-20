@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-const COR_META = { dark: '#0e1116', light: '#f5f6f8' };
+const COR_META = { dark: '#0e1116', light: '#ffffff' };
 const atual = () => document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
 
-/** Alterna entre tema claro e escuro. A escolha fica salva no navegador; sem escolha, segue o sistema. */
+/** Alterna entre tema claro e escuro. A escolha fica salva no navegador; sem escolha, o tema claro é o padrão. */
 export default function ThemeToggle() {
   const [tema, setTema] = useState(atual);
   const aplicar = (t) => {
@@ -11,12 +11,6 @@ export default function ThemeToggle() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', COR_META[t]);
     setTema(t);
   };
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: light)');
-    const on = (e) => { let salvo = null; try { salvo = localStorage.getItem('tema'); } catch { /* sem armazenamento */ } if (!salvo) aplicar(e.matches ? 'light' : 'dark'); };
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
-  }, []);
   const claro = tema === 'light';
   const alternar = () => { const t = claro ? 'dark' : 'light'; try { localStorage.setItem('tema', t); } catch { /* sem armazenamento */ } aplicar(t); };
   return (
