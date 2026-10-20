@@ -54,3 +54,8 @@ O TSE atualiza o painel às 06:25, 11:25, 15:25 e 20:25. Cada lista nova vira a 
 - **Rotina completa:** `scripts/atualizar-tudo.mjs` faz tudo (painel → análise → consulta → conferência → push). Exemplo de cron (Brasília, 10 min depois de cada atualização do TSE): `35 6,11,15,20 * * *  cd ~/secoes-eleitorais && CONSULTA_DIR=~/secoes-eleitorais-consulta-2026 node scripts/atualizar-tudo.mjs >> ~/atualizacao.log 2>&1`
 - **Manual pelo GitHub:** Actions → *Atualizar lista do TSE* → *Run workflow* → cole o link do `.csv.zip`. O GitHub não consegue ler o painel (bloqueio), então não há agendamento lá.
 - **Conferência:** `npm run verificar` recalcula tudo direto do CSV e compara com o que o site mostra.
+
+## Grupo de controle (1º turno inteiro)
+
+`scripts/votacao-secao.mjs` lê a votação por seção do TSE (`votacao_secao_2026_BR.zip`, ~1 GB descompactado) e grava `.dados/votacao_secoes.csv` (ignorado pelo git).
+`scripts/gerar-controle.mjs` cruza esse arquivo com as seções das listas e grava `server/data/controle.json` (pequeno, versionado): diferença de margem entre seções alteradas e as demais do mesmo município, com IC 95% por bootstrap de municípios e teste de permutação. Aparece em Explorar → Grupo de controle. Rode os dois scripts de novo quando as listas mudarem.

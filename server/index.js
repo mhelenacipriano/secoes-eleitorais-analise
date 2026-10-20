@@ -26,6 +26,8 @@ const sendOrCsv = (nome, fn) => (req, res) => {
   return req.query.format === 'csv' ? csv(res, nome, Array.isArray(data) ? data : data.detalhe) : res.json(data);
 };
 
+const controle = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'controle.json'), 'utf8')); } catch { return null; } })();
+app.get('/api/controle', (_req, res) => (controle ? res.json(controle) : res.status(404).json({ erro: 'controle.json não gerado' })));
 app.get('/api/meta', (_req, res) => res.json(meta()));
 app.get('/api/resumo', sendOrCsv('resumo-por-lista', resumo));
 app.get('/api/mudancas', sendOrCsv('mudancas-entre-listas', mudancas));

@@ -4,3 +4,4 @@ client/dist
 .raspagem.csv
 .tmp-lista.zip
 depuracao-painel.*
+.dados/
