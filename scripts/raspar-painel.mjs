@@ -107,10 +107,21 @@ try {
     const req = await quadro('requisicao-arquivos', 60000);
     if (!req) { await diag('requisicao'); throw new Error('a janela "Requisição de arquivos" não abriu (salvei depuracao-requisicao.*)'); }
     await req.waitForLoadState('networkidle').catch(() => {});
-    const csvBr = req.locator('input[value="CSV_BR"]').first();                              // tipo de arquivo usado pelo painel
-    if (await csvBr.count()) await csvBr.check({ force: true }).catch(() => {});
-    else await req.getByLabel(/csv/i).first().check({ force: true }).catch(() => {});
-    await req.locator('button, a, input[type=button], input[type=submit]').filter({ hasText: /^\s*gerar\s*$/i }).or(req.getByRole('button', { name: /^\s*gerar\s*$/i })).first().click({ timeout: 15000 });
+    // tipo de arquivo: CSV_BR (item P2_TP_ARQUIVO da página). Tenta pela API do APEX e, se não der, pelo campo na tela.
+    const marcou = await req.evaluate(() => { try { if (window.apex && apex.item('P2_TP_ARQUIVO').node) { apex.item('P2_TP_ARQUIVO').setValue('CSV_BR'); return String(apex.item('P2_TP_ARQUIVO').getValue()); } } catch (e) { /* segue */ } return null; }).catch(() => null);
+    if (!marcou) {
+      const csvBr = req.locator('input[value="CSV_BR"]').first();
+      if (await csvBr.count()) await csvBr.check({ force: true }).catch(() => {});
+      else await req.getByLabel(/csv/i).first().check({ force: true }).catch(() => {});
+    }
+    console.error(`Tipo de arquivo: ${marcou || 'marcado pelo campo na tela'}. Procurando o botão "Gerar" dentro da janela...`);
+    // o botão dentro da janela pode se chamar "Gerar", "Gerar arquivo" ou "Gerar arquivos" (há também "Cancelar")
+    const gerar = req.locator('button').filter({ has: req.locator('.t-Button-label', { hasText: /^\s*gerar\b/i }) }).first()
+      .or(req.getByRole('button', { name: /^\s*gerar\b/i }).first()).or(req.locator('button, a.t-Button, input[type=button]').filter({ hasText: /^\s*gerar\b/i }).first()).first();
+    await gerar.waitFor({ state: 'visible', timeout: 20000 }).catch(async () => { await diag('requisicao'); throw new Error('não achei o botão "Gerar" na janela (salvei depuracao-requisicao.*)'); });
+    await gerar.scrollIntoViewIfNeeded().catch(() => {});
+    try { await gerar.click({ timeout: 8000 }); } catch { await gerar.evaluate((el) => el.click()); }
+    console.error('Cliquei em "Gerar" na janela. Aguardando a janela "Geração de arquivos"...');
     const ger = await quadro('geracao-arquivos', 45000);
     if (!ger) { await diag('geracao'); throw new Error('a janela "Geração de arquivos" não abriu (salvei depuracao-geracao.*)'); }
     const limite = Date.now() + Number(process.env.GERAR_TIMEOUT_S || 180) * 1000;   // a janela consulta o servidor até o arquivo ficar pronto
