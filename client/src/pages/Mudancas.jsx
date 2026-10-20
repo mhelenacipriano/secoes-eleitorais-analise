@@ -12,7 +12,7 @@ export default function Mudancas({ filtros }) {
   if (!st.data) return <Carregando state={st} />;
   const { detalhe, efeito } = st.data;
   const itens = detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === 1 && d.b === 4)))
-    .map((d) => ({ rotulo: `${d.passo} · ${d.situacao.toLowerCase()} (${nInt(d.secoes)})`, valor: d.margem, dica: [`${nInt(d.secoes)} seções · ${nInt(d.eleitores)} eleitores`, `Lula ${nPct(d.lulaPct)} · Flávio ${nPct(d.flavioPct)}`] }));
+    .map((d) => ({ id: `${d.passo}|${d.situacao}`, rotulo: `${d.passo} · ${d.situacao.toLowerCase()} (${nInt(d.secoes)})`, valor: d.margem, dica: [`${nInt(d.secoes)} seções · ${nInt(d.eleitores)} eleitores`, `Lula ${nPct(d.lulaPct)} · Flávio ${nPct(d.flavioPct)}`] }));
   return (
     <div className="stack">
       <Card titulo="Margem nas seções que saíram, ficaram ou entraram" nota="Barra à direita (sólida): Lula na frente. Barra à esquerda (listrada): Flávio na frente. A margem é do 1º turno e não indica o motivo da mudança.">
@@ -27,7 +27,7 @@ export default function Mudancas({ filtros }) {
         ]} rows={efeito} />
       </Recolhivel>
       <Recolhivel titulo="Detalhe de cada troca" nota="Seções removidas, mantidas e adicionadas" acoes={<Baixar path="mudancas" params={p} />}>
-        <DataTable chave="b" columns={[
+        <DataTable chave="b" idLinha={(r) => `${r.passo}|${r.situacao}`} columns={[
           { key: 'passo', label: 'Troca', left: true }, { key: 'situacao', label: 'Situação', left: true }, { key: 'secoes', label: 'Seções', format: nInt },
           { key: 'semResultado', label: 'Sem resultado', format: nInt, hint: 'Seções sem resultado do 1º turno cruzado. Ficam fora das porcentagens.' },
           { key: 'eleitores', label: 'Eleitores', format: nInt, hint: H.eleitores }, { key: 'lulaPct', label: 'Lula', format: nPct, hint: H.pct }, { key: 'flavioPct', label: 'Flávio', format: nPct, hint: H.pct }, { key: 'margem', label: 'Margem', format: nPts, tone: true, hint: H.margem },

@@ -285,3 +285,10 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
   .totop:hover { border-color: var(--red-solid); }
 }
 @media (prefers-reduced-motion: reduce) { .pagina-anim, .pagina-anim > *, .banner, .aviso-obra { animation: none !important; } .nav button::after { transition: none; } }
+
+/* destaque ligado entre gráficos e tabelas (passar o mouse ou focar) */
+.chart g.lig { outline: none; transition: opacity .15s ease; } .chart g.lig.dim { opacity: .35; }
+.chart g.lig:focus-visible rect[fill="transparent"] { stroke: var(--red-solid); stroke-width: 2; }
+.chart g.lig.on circle { r: 7; } .chart g.lig.on rect:not([fill="transparent"]) { stroke: var(--fg); stroke-width: 1.5; }
+tbody tr.hl td { background: var(--soft); } tbody tr.hl td:first-child { box-shadow: inset 3px 0 0 var(--red-solid); }
+@media (prefers-reduced-motion: reduce) { .chart g.lig { transition: none; } }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { nPts, nInt } from '../format.js';
+import { setDestaque, useDestaque } from '../destaque.js';
 
 export const COR = { lula: 'var(--lula)', flavio: 'var(--flavio)', neutro: 'var(--neutro)' };
 
@@ -38,6 +39,7 @@ const textW = (s, px = 6.2) => s.length * px;
 export function BarrasMargem({ itens, rotuloLargura }) {
   const [ref, w] = useWidth();
   const [box, tip, on, off] = useTip();
+  const dest = useDestaque();
   if (!itens.length) return <Empty />;
   const rowH = 26, H = itens.length * rowH + 8;
   const left = (rotuloLargura || Math.max(...itens.map((i) => textW(i.rotulo)))) + 12, pad = 64;
@@ -50,7 +52,8 @@ export function BarrasMargem({ itens, rotuloLargura }) {
         {itens.map((it, i) => {
           const y = 4 + i * rowH, pos = it.valor >= 0, x0 = x(0), x1 = x(it.valor);
           return (
-            <g key={it.rotulo} onMouseMove={on([it.rotulo, ...(it.dica || [])])} onMouseLeave={off}>
+            <g key={it.rotulo} className={'lig' + (dest && dest !== (it.id || it.rotulo) ? ' dim' : '') + (dest && dest === (it.id || it.rotulo) ? ' on' : '')} tabIndex={0} aria-label={[it.rotulo, ...(it.dica || [])].join('. ')}
+              onMouseMove={on([it.rotulo, ...(it.dica || [])])} onMouseEnter={() => setDestaque(it.id || it.rotulo)} onMouseLeave={() => { off(); setDestaque(''); }} onFocus={() => setDestaque(it.id || it.rotulo)} onBlur={() => setDestaque('')}>
               <rect x="0" y={y} width={w} height={rowH} fill="transparent" />
               <text x={left - 8} y={y + 17} textAnchor="end" className="strong">{it.rotulo}</text>
               <rect x={Math.min(x0, x1)} y={y + 5} width={Math.max(2, Math.abs(x1 - x0))} height="15" rx="3" fill={pos ? COR.lula : 'url(#hachF)'} />
@@ -69,6 +72,7 @@ export function BarrasMargem({ itens, rotuloLargura }) {
 export function Halteres({ estados }) {
   const [ref, w] = useWidth();
   const [box, tip, on, off] = useTip();
+  const dest = useDestaque();
   const itens = estados.filter((e) => e.m1 != null && e.m4 != null);
   if (!itens.length) return <Empty />;
   const rowH = 24, H = itens.length * rowH + 34, all = itens.flatMap((e) => [e.m1, e.m4]);
@@ -82,7 +86,9 @@ export function Halteres({ estados }) {
         {itens.map((e, i) => {
           const y = 14 + i * rowH;
           return (
-            <g key={e.uf} onMouseMove={on([e.uf, `18/10 · 11h: ${nPts(e.m1)} (${nInt(e.el1)} eleitores)`, `Painel do TSE: ${nPts(e.m4)} (${nInt(e.el4)} eleitores)`])} onMouseLeave={off}>
+            <g key={e.uf} className={'lig' + (dest && dest !== e.uf ? ' dim' : '') + (dest === e.uf ? ' on' : '')} tabIndex={0}
+              aria-label={`${e.uf}. 18/10 · 11h: ${nPts(e.m1)}. Painel do TSE: ${nPts(e.m4)}`}
+              onMouseMove={on([e.uf, `18/10 · 11h: ${nPts(e.m1)} (${nInt(e.el1)} eleitores)`, `Painel do TSE: ${nPts(e.m4)} (${nInt(e.el4)} eleitores)`])} onMouseEnter={() => setDestaque(e.uf)} onMouseLeave={() => { off(); setDestaque(''); }} onFocus={() => setDestaque(e.uf)} onBlur={() => setDestaque('')}>
               <rect x="0" y={y - 12} width={w} height={rowH} fill="transparent" />
               <text x="0" y={y + 4} className="strong">{e.uf}</text>
               <line x1={x(e.m1)} x2={x(e.m4)} y1={y} y2={y} stroke="var(--neutro)" strokeWidth="2" />

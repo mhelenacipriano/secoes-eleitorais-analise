@@ -1,9 +1,11 @@
 import { useMemo } from 'react';
 import { useParam, useParamNum } from '../router.js';
+import { setDestaque, useDestaque } from '../destaque.js';
 import { InfoTip } from './ui.jsx';
 
 /** Tabela com ordenação por clique no título, busca opcional e paginação. */
-export default function DataTable({ columns, rows, initialSort, pageSize = 0, free = false, vazio = 'Nenhuma linha para este filtro.', chave = 't' }) {
+export default function DataTable({ columns, rows, initialSort, pageSize = 0, free = false, vazio = 'Nenhuma linha para este filtro.', chave = 't', idLinha }) {
+  const dest = useDestaque();
   // ordenação e página ficam na URL (chave+o = coluna, chave+d = sentido, chave+p = página), para o link reproduzir a tabela
   const [oKey, setOKey] = useParam(chave + 'o', initialSort?.key || '');
   const [oDir, setODir] = useParamNum(chave + 'd', initialSort?.dir || 1);
@@ -42,7 +44,7 @@ export default function DataTable({ columns, rows, initialSort, pageSize = 0, fr
           </thead>
           <tbody>
             {shown.map((r, i) => (
-              <tr key={i}>
+              <tr key={i} className={idLinha && dest && dest === idLinha(r) ? 'hl' : undefined} onMouseEnter={idLinha ? () => setDestaque(idLinha(r)) : undefined} onMouseLeave={idLinha ? () => setDestaque('') : undefined}>
                 {columns.map((c) => (
                   <td key={c.key} className={(c.left ? 'left ' : '') + (c.wrap ? 'wrap ' : '') + (c.tone ? (r[c.key] == null ? '' : r[c.key] >= 0 ? 'pos' : 'neg') : '')}>{c.format ? c.format(r[c.key]) : r[c.key]}</td>
                 ))}

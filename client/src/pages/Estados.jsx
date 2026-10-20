@@ -16,7 +16,7 @@ export default function Estados({ filtros }) {
         <Halteres estados={st.data} />
       </Card>
       <Recolhivel titulo="Tabela de estados" nota={`${nInt(st.data.length)} estados`} aberto acoes={<Baixar path="estados" params={p} />}>
-        <DataTable free vazio="Nenhum estado corresponde aos filtros." columns={[
+        <DataTable free idLinha={(r) => r.uf} vazio="Nenhum estado corresponde aos filtros." columns={[
           { key: 'uf', label: 'UF', left: true }, { key: 'el1', label: 'Eleitores 18/10 · 11h', format: nInt, hint: H.eleitores }, { key: 'el4', label: 'Eleitores painel do TSE', format: nInt, hint: H.eleitores },
           { key: 'm1', label: 'Margem 18/10 · 11h', format: nPts, tone: true, hint: H.margem }, { key: 'm2', label: 'Margem 18/10 · 17h', format: nPts, tone: true, hint: H.margem },
           { key: 'm3', label: 'Margem 19/10 · 11h', format: nPts, tone: true, hint: H.margem }, { key: 'm4', label: 'Margem painel do TSE', format: nPts, tone: true, hint: H.margem },
