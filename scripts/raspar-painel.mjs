@@ -80,18 +80,34 @@ try {
     const links = new Set();
     const olha = (u) => { if (u && u.includes(CDN) && /\.zip(\?|$)/i.test(u)) links.add(u); };
     pagina.on('request', (r) => olha(r.url())); pagina.on('response', (r) => olha(r.url())); pagina.on('download', (d) => olha(d.url()));
-    await pagina.getByRole('button', { name: /gerar arquivos/i }).first().click({ timeout: 15000 });
-    await pagina.waitForURL(/requisicao-arquivos/i, { timeout: 45000 });                      // "Requisição de arquivos"
-    await pagina.waitForLoadState('networkidle').catch(() => {});
-    const csvBr = pagina.locator('input[value="CSV_BR"]').first();                            // tipo de arquivo usado pelo painel
-    if (await csvBr.count()) await csvBr.check().catch(() => {});
-    await pagina.getByRole('button', { name: /^\s*gerar\b/i }).first().click({ timeout: 15000 });
-    await pagina.waitForURL(/geracao-arquivos/i, { timeout: 45000 });                          // "Geração de arquivos" (consulta o servidor até ficar pronto)
-    const limite = Date.now() + Number(process.env.GERAR_TIMEOUT_S || 180) * 1000;   // espera o arquivo ficar pronto
+    // "Gerar arquivos" abre uma janela (diálogo com iframe) "Requisição de arquivos"; depois outra, "Geração de arquivos".
+    // Não são páginas novas: o endereço da aba não muda, então o que se espera são os iframes, não a URL.
+    const diag = async (nome) => {
+      await pagina.screenshot({ path: `depuracao-${nome}.png`, fullPage: true }).catch(() => {});
+      const partes = []; for (const f of pagina.frames()) partes.push(`<!-- ${f.url()} -->\n` + (await f.content().catch(() => '')));
+      fs.writeFileSync(`depuracao-${nome}.html`, partes.join('\n'));
+    };
+    const quadro = async (trecho, ms) => {
+      const fim_ = Date.now() + ms;
+      while (Date.now() < fim_) { const f = pagina.frames().find((x) => x.url().includes(trecho)); if (f) { await f.waitForLoadState('load').catch(() => {}); return f; } await pagina.waitForTimeout(500); }
+      return null;
+    };
+    await pagina.locator('button, a').filter({ hasText: /gerar arquivos/i }).first().click({ timeout: 15000 });
+    const req = await quadro('requisicao-arquivos', 45000);
+    if (!req) { await diag('requisicao'); throw new Error('a janela "Requisição de arquivos" não abriu (salvei depuracao-requisicao.*)'); }
+    await req.waitForLoadState('networkidle').catch(() => {});
+    const csvBr = req.locator('input[value="CSV_BR"]').first();                              // tipo de arquivo usado pelo painel
+    if (await csvBr.count()) await csvBr.check({ force: true }).catch(() => {});
+    else await req.getByLabel(/csv/i).first().check({ force: true }).catch(() => {});
+    await req.locator('button, a, input[type=button], input[type=submit]').filter({ hasText: /^\s*gerar\s*$/i }).or(req.getByRole('button', { name: /^\s*gerar\s*$/i })).first().click({ timeout: 15000 });
+    const ger = await quadro('geracao-arquivos', 45000);
+    if (!ger) { await diag('geracao'); throw new Error('a janela "Geração de arquivos" não abriu (salvei depuracao-geracao.*)'); }
+    const limite = Date.now() + Number(process.env.GERAR_TIMEOUT_S || 180) * 1000;   // a janela consulta o servidor até o arquivo ficar pronto
     while (Date.now() < limite && !links.size) {
-      for (const h of await pagina.$$eval('a[href]', (as) => as.map((a) => a.href))) olha(h);
+      for (const f of pagina.frames()) for (const h of await f.$$eval('a[href]', (as) => as.map((a) => a.href)).catch(() => [])) olha(h);
       if (!links.size) await pagina.waitForTimeout(2000);
     }
+    if (!links.size) await diag('geracao');
     return [...links].sort((a, b) => ((/\/(\d{8}_\d{6})\//.exec(b) || [])[1] || '').localeCompare((/\/(\d{8}_\d{6})\//.exec(a) || [])[1] || ''))[0] || null;
   }
   if (!soTabela) {
