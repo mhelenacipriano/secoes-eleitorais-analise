@@ -250,3 +250,9 @@ strong.t-saiu { color: var(--saiu); } strong.t-entrou { color: var(--entrou); }
 }
 @media print { .banner-det { display: block !important; } .banner-toggle { display: none !important; } }
 @media (max-width: 760px) { .brand { flex: 1 1 0; min-width: 0; line-height: 1.2; } }
+
+/* aviso de página em construção (topo) */
+.aviso-obra { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin: 12px 0 0; padding: 8px 14px; border-radius: 10px; background: color-mix(in srgb, var(--red-solid) 12%, var(--panel)); border: 1px solid color-mix(in srgb, var(--red-solid) 40%, var(--line)); color: var(--fg); font-size: .85rem; line-height: 1.45; }
+.obra-selo { flex: none; padding: 2px 10px; border-radius: 999px; background: var(--red-solid); color: #fff; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.aviso-obra + .banner { margin-top: 8px; }
+@media (max-width: 760px) { .aviso-obra { padding: 8px 12px; font-size: .8rem; } }

@@ -38,6 +38,7 @@ export default function App() {
         </nav>
       </div>
       <main id="conteudo">
+        <p className="aviso-obra" role="status"><span className="obra-selo">Em construção</span> Esta página ainda está em construção: o conteúdo, os números e os gráficos podem mudar e conter erros.</p>
         <FonteAviso />
         {!meta.data ? <Carregando state={meta} /> : (
           <>
