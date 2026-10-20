@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { nInt } from '../format.js';
 import { InfoTip } from './ui.jsx';
 import { useWidth } from './Charts.jsx';
+import { BaixarGrafico } from './ui.jsx';
+import { descreveFiltros } from '../exportar.js';
 
 const NOTA = 'Estas são mudanças nas listas publicadas. Uma seção que sai de uma lista não necessariamente teve o local de votação fisicamente alterado ou cancelado; pode ter sido corrigida, reclassificada ou excluída por outro motivo que os dados não informam.';
 
 /** Fluxo entre versões consecutivas: o que ficou, o que saiu e o que entrou. */
-export default function SectionTransitionFlow({ listas, transicoes }) {
+export default function SectionTransitionFlow({ listas, transicoes, filtros }) {
   const [ref, w] = useWidth();
   const [foco, setFoco] = useState(null);   // só o destaque ao passar o mouse: não vai para a URL
   const seq = transicoes.filter((t) => t.ate === t.de + 1);
@@ -57,6 +59,8 @@ export default function SectionTransitionFlow({ listas, transicoes }) {
           })}
         </svg>
       </div>
+      <BaixarGrafico titulo="Quem saiu, ficou e entrou entre as listas" filtros={descreveFiltros(filtros)} nome="fluxo-entre-listas"
+        csv={{ colunas: [{ key: 'rotulo', label: 'Troca' }, { key: (t) => t.removidas.secoes, label: 'Saíram' }, { key: (t) => t.mantidas.secoes, label: 'Ficaram' }, { key: (t) => t.adicionadas.secoes, label: 'Entraram' }], linhas: transicoes }} />
       <ul className="flow-lista">
         {transicoes.map((t) => (
           <li key={t.id} className={t.id === '1-4' ? 'cumul' : ''}>

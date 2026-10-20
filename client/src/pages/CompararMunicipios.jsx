@@ -4,7 +4,7 @@ import { nInt, nPct, nPts, quem } from '../format.js';
 import { H } from '../hints.js';
 import { useParam, useParamNum } from '../router.js';
 import { BarrasMargem } from '../components/Charts.jsx';
-import { Card, Carregando, Legenda } from '../components/ui.jsx';
+import { BaixarGrafico, Card, Carregando, Legenda } from '../components/ui.jsx';
 
 const valorDe = (m) => `${m.uf}:${m.municipio.split(' · ').slice(1).join(' · ')}`;
 const nomeDe = (m) => m.municipio.split(' · ').slice(1).join(' · ');
@@ -97,7 +97,8 @@ export default function CompararMunicipios() {
               </table>
             </div>
           </Card>
-          <Card titulo="Margem na lista escolhida" nota="Barra à direita (sólida): Lula na frente. Barra à esquerda (listrada): Flávio na frente.">
+          <Card titulo="Margem na lista escolhida" acoes={<BaixarGrafico titulo={`Margem: ${nome(a)} × ${nome(b)} (lista ${rotuloLista})`} filtros={`Lista: ${rotuloLista}`} nome={`comparar-${nome(a)}-${nome(b)}`}
+            csv={{ colunas: [{ key: 'indicador', label: 'Indicador' }, { key: 'a', label: nome(a) }, { key: 'b', label: nome(b) }], linhas: LINHAS.map(([rot, f]) => ({ indicador: rot, a: f(ua), b: f(ub) })) }} />} nota="Barra à direita (sólida): Lula na frente. Barra à esquerda (listrada): Flávio na frente.">
             <Legenda />
             <BarrasMargem itens={barras} />
           </Card>

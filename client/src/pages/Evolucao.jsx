@@ -16,7 +16,7 @@ export default function Evolucao({ filtros }) {
       <h1 className="page-title">Evolução das listas</h1>
       {filtrado && <p className="note">Recorte ativo: {[filtros.uf, filtros.municipio && filtros.municipio.replace(':', ' · '), filtros.lider && (filtros.lider === 'L' ? 'seções com Lula na frente' : 'seções com Flávio na frente')].filter(Boolean).join(' · ')}. Em recortes pequenos, as porcentagens variam muito e merecem cautela.</p>}
       <Secao titulo="Versões das listas"><EvolucaoListas key={listas.length + filtros.uf} listas={listas} transicoes={transicoes} /></Secao>
-      <Secao titulo="Quem saiu, ficou e entrou"><SectionTransitionFlow listas={listas} transicoes={transicoes} /></Secao>
+      <Secao titulo="Quem saiu, ficou e entrou"><SectionTransitionFlow listas={listas} transicoes={transicoes} filtros={filtros} /></Secao>
       <Secao titulo="Perfil das seções por atualização"><ElectoralProfileComparison transicoes={transicoes} /></Secao>
     </div>
   );

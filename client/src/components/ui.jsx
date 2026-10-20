@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { csvUrl } from '../api.js';
 import { nPct } from '../format.js';
+import { baixarCsv, baixarPng, nomeArquivo } from '../exportar.js';
 
 /** Revela o bloco com uma transição suave quando ele entra na tela. */
 export function Reveal({ as: Tag = 'div', className = '', children, ...rest }) {
@@ -77,5 +78,23 @@ export function BarraCandidatos({ lula, flavio, outros = null, compacta = false 
       <span className="seg flavio" style={{ width: w(flavio) }}><b>Flávio</b> {nPct(flavio)}</span>
       {outros != null && outros > 0.005 && <span className="seg outros" style={{ width: w(outros) }} title={`Outros ${nPct(outros)}`} />}
     </div>
+  );
+}
+
+/** Botões "Baixar gráfico (PNG)" e "Baixar dados (CSV)" para um cartão com um gráfico em SVG. O PNG leva título e filtros ativos. */
+export function BaixarGrafico({ titulo, filtros = '', nome, csv }) {
+  const [erro, setErro] = useState('');
+  const png = async (e) => {
+    const alvo = e.currentTarget.closest('.card, .flow-wrap, section') || document;
+    const svg = alvo.querySelector('.chart svg, .flow svg');
+    if (!svg) { setErro('Gráfico indisponível.'); return; }
+    try { setErro(''); await baixarPng(svg, { titulo, filtros, nome: nomeArquivo(nome || titulo) }); } catch (x) { setErro(x.message); }
+  };
+  return (
+    <span className="baixar-grafico">
+      <button type="button" className="btn" onClick={png}>Baixar gráfico (PNG)</button>
+      {csv && <button type="button" className="btn" onClick={() => baixarCsv(nomeArquivo(nome || titulo), csv.colunas, csv.linhas)}>Baixar dados (CSV)</button>}
+      {erro && <span className="note" role="alert">{erro}</span>}
+    </span>
   );
 }

@@ -320,3 +320,6 @@ tbody tr.hl td { background: var(--soft); } tbody tr.hl td:first-child { box-sha
 .comp-sel { display: grid; gap: 6px; font-size: .92rem; } .comp-sel select { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--fg); min-height: 44px; font: inherit; }
 .comp-frase { margin: 0 0 12px; line-height: 1.55; }
 .comp-tab td, .comp-tab th { text-align: right; } .comp-tab td.left, .comp-tab th.left { text-align: left; }
+
+.baixar-grafico { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+@media print { .baixar-grafico { display: none !important; } }

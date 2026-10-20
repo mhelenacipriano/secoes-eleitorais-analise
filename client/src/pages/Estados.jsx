@@ -3,7 +3,10 @@ import { nInt, nPts } from '../format.js';
 import { H } from '../hints.js';
 import { Halteres } from '../components/Charts.jsx';
 import DataTable from '../components/DataTable.jsx';
-import { Baixar, Card, Carregando, Recolhivel } from '../components/ui.jsx';
+import { Baixar, BaixarGrafico, Card, Carregando, Recolhivel } from '../components/ui.jsx';
+import { descreveFiltros } from '../exportar.js';
+
+const CSV_ESTADOS = [{ key: 'uf', label: 'UF' }, ...[1, 2, 3, 4].flatMap((k) => [{ key: 'el' + k, label: `Eleitores lista ${k}` }, { key: (e) => (e['m' + k] == null ? '' : e['m' + k].toFixed(2)), label: `Margem lista ${k} (pts)` }])];
 
 export default function Estados({ filtros }) {
   const p = { uf: filtros.uf, municipio: filtros.municipio, lider: filtros.lider };
@@ -11,7 +14,7 @@ export default function Estados({ filtros }) {
   if (!st.data) return <Carregando state={st} />;
   return (
     <div className="stack">
-      <Card titulo="Margem por estado" nota="Cada linha liga a margem do estado na lista de 18/10 · 11h à margem na lista de 20/10 · 13h59. Estados sem os dois pontos não estavam nas duas listas.">
+      <Card titulo="Margem por estado" acoes={<BaixarGrafico titulo="Margem por estado: 18/10 · 11h × 20/10 · 13h59" filtros={descreveFiltros(filtros)} nome="margem-por-estado" csv={{ colunas: CSV_ESTADOS, linhas: st.data }} />} nota="Cada linha liga a margem do estado na lista de 18/10 · 11h à margem na lista de 20/10 · 13h59. Estados sem os dois pontos não estavam nas duas listas.">
         <div className="legend"><span><i className="sw neu" />18/10 · 11h</span><span><i className="sw ult" />20/10 · 13h59</span></div>
         <Halteres estados={st.data} />
       </Card>
