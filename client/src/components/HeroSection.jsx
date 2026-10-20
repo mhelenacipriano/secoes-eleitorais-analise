@@ -1,4 +1,5 @@
 import { Reveal } from './ui.jsx';
+import ShareButton from './ShareButton.jsx';
 
 export default function HeroSection({ onSaiba, onExplorar }) {
   return (
@@ -13,6 +14,7 @@ export default function HeroSection({ onSaiba, onExplorar }) {
         <div className="hero-cta">
           <button className="btn primary big" onClick={onSaiba}>Ver a evolução das listas ↓</button>
           <button className="btn big" onClick={onExplorar}>Explorar os dados</button>
+          <ShareButton titulo="O que mudou nas seções eleitorais?" texto="Os dados mostram o perfil eleitoral das seções, não comprovam mudanças no resultado da eleição." />
         </div>
       </Reveal>
     </header>

@@ -30,7 +30,7 @@ export function InfoTip({ texto, rotulo = 'Mais informações' }) {
 }
 
 export const Carregando = ({ state }) =>
-  state.loading && !state.data ? <div className="spinner" role="status">Carregando…</div>
+  state.loading && !state.data ? <div className="skeleton" role="status" aria-label="Carregando"><i /><i /><i /></div>
     : state.error ? <div className="empty">Não foi possível carregar os dados ({state.error.message}).</div> : null;
 
 export const Baixar = ({ path, params, texto = 'Baixar CSV' }) => <a className="btn" href={csvUrl(path, params)} download>{texto}</a>;

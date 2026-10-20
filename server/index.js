@@ -39,5 +39,10 @@ if (fs.existsSync(dist)) {
   app.use(express.static(dist));
   app.get('*', (_req, res) => res.sendFile(path.join(dist, 'index.html')));
 }
-const port = process.env.PORT || 3001;
-app.listen(port, () => console.log(`Site no ar em http://localhost:${port}`));
+// Na Vercel o app roda como função (api/index.js) e não abre porta.
+if (!process.env.VERCEL) {
+  const port = process.env.PORT || 3001;
+  app.listen(port, () => console.log(`Site no ar em http://localhost:${port}`));
+}
+
+export default app;

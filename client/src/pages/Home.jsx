@@ -6,6 +6,7 @@ import ElectoralProfileComparison from '../components/ElectoralProfileComparison
 import SaberEstimar from '../components/SaberEstimar.jsx';
 import PotentialImpactExplorer from '../components/PotentialImpactExplorer.jsx';
 import FindingsSummary from '../components/FindingsSummary.jsx';
+import KeyFacts from '../components/KeyFacts.jsx';
 import { Carregando, Reveal } from '../components/ui.jsx';
 
 export const Secao = ({ id, letra, titulo, intro, children }) => (
@@ -25,6 +26,7 @@ export default function Home({ ir }) {
       <HeroSection onSaiba={rolar} onExplorar={() => ir('explorar')} />
       {!st.data ? <Carregando state={st} /> : (
         <>
+          <KeyFacts listas={st.data.listas} transicoes={st.data.transicoes} />
           <Secao id="evolucao" letra="1 · A evolução das listas" titulo="Quatro listas, composições bem diferentes" intro="Toque em uma versão para ver quantas seções e eleitores ela reunia e como era o voto do 1º turno nessas seções.">
             <EvolucaoListas listas={st.data.listas} transicoes={st.data.transicoes} />
           </Secao>

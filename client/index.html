@@ -5,10 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>O que mudou nas seções eleitorais · 2º turno 2026</title>
     <meta name="description" content="Análise das listas de seções eleitorais alteradas para o 2º turno de 2026, cruzadas com os resultados do 1º turno." />
-    <meta name="theme-color" content="#14130f" />
+    <meta name="theme-color" content="#0e1116" />
     <meta property="og:title" content="O que mudou nas seções eleitorais — e quem poderia ser afetado?" />
     <meta property="og:description" content="Os dados mostram o perfil eleitoral das seções, não comprovam mudanças no resultado da eleição." />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="dark light" />
+    <script>
+      // Aplica o tema antes da primeira pintura (evita piscar): escolha salva ou preferência do sistema.
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem("tema"); } catch (e) {}
+        if (t !== "light" && t !== "dark") t = window.matchMedia && matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

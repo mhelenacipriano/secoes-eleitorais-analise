@@ -27,3 +27,15 @@ Os filtros (estado, município, versão, transição, candidato na frente, situa
 - Eleitores da lista, aptos no 1º turno e votos válidos são medidas diferentes e aparecem separadas.
 - A margem de uma lista não é a margem nacional; a variação entre listas não é “swing”.
 - O cenário hipotético não é previsão e não usa totais nacionais (não existem nos dados).
+
+## Tema
+
+Claro e escuro, com alternância no topo (segue o sistema na primeira visita e guarda a escolha). Identidade em vermelho e branco/cinza-escuro; só os resultados de Flávio Bolsonaro são azuis, sempre também com padrão listrado e rótulo de texto.
+
+## Deploy na Vercel
+
+O front-end (Vite) vira site estático e a API Express roda como função (`api/index.js`, que reaproveita `server/index.js`). A configuração está em `vercel.json`.
+
+1. Importe o repositório em vercel.com/new (Framework: Other; não mude os comandos, eles vêm do `vercel.json`).
+2. Opcional: defina `VITE_CONSULTA_URL` (endereço da página de consulta) em Settings → Environment Variables para mostrar o link no rodapé.
+3. Deploy. Cada push na branch de produção publica de novo.

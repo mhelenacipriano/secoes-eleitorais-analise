@@ -8,6 +8,9 @@ import Explorar from './pages/Explorar.jsx';
 import Metodologia from './pages/Metodologia.jsx';
 import Filters from './components/Filters.jsx';
 import { Carregando } from './components/ui.jsx';
+import ThemeToggle from './components/ThemeToggle.jsx';
+import ToTop from './components/ToTop.jsx';
+import { CONSULTA_URL } from './config.js';
 
 const NAV = [['', 'Visão geral'], ['evolucao', 'Evolução das listas'], ['impacto', 'Impacto potencial'], ['explorar', 'Explorar dados'], ['metodologia', 'Metodologia e fontes']];
 
@@ -24,8 +27,11 @@ export default function App() {
     <div className="app">
       <a className="skip" href="#conteudo">Ir para o conteúdo</a>
       <div className="topbar">
-        <button className="brand" onClick={() => vai('')}>Seções eleitorais · 2º turno 2026</button>
-        <button className="menu-btn" aria-expanded={menu} aria-controls="nav" onClick={() => setMenu((m) => !m)}>{menu ? 'Fechar' : 'Menu'}</button>
+        <button className="brand" onClick={() => vai('')}>Seções eleitorais · 2026</button>
+        <div className="top-actions">
+          <ThemeToggle />
+          <button className="menu-btn" aria-expanded={menu} aria-controls="nav" onClick={() => setMenu((m) => !m)}>{menu ? 'Fechar' : 'Menu'}</button>
+        </div>
         <nav id="nav" className={'nav' + (menu ? ' open' : '')} aria-label="Seções do site">
           {NAV.map(([id, nome]) => <button key={id} aria-current={pagina === id ? 'page' : undefined} onClick={() => vai(id)}>{nome}</button>)}
         </nav>
@@ -43,8 +49,10 @@ export default function App() {
         )}
       </main>
       <footer className="foot">
+        {CONSULTA_URL && <a className="btn" href={CONSULTA_URL}>Consulte a sua seção →</a>}
         <p>Os dados mostram o perfil eleitoral das seções, não comprovam mudanças no resultado da eleição. Fonte: listas de seções alteradas e resultados do 1º turno de 2026 (CSV do projeto). Este site não sugere fraude nem interferência.</p>
       </footer>
+      <ToTop />
     </div>
   );
 }
