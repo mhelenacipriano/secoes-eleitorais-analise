@@ -16,7 +16,7 @@ export default function SectionTransitionFlow({ listas, transicoes }) {
   const esc = (H - topo - baixo - desce - 30) / max;
   const gap = (w - 24 - cols.length * colW) / (cols.length - 1);
   const x = (i) => 12 + i * (colW + gap);
-  const nomes = ['18/10 · 11h', '18/10 · 17h', '19/10 · 11h', 'Lista de 438'];
+  const nomes = ['18/10 · 11h', '18/10 · 17h', '19/10 · 11h', 'Última lista'];
   const faixa = (x0, y0, x1, y1, h) => {
     const m = (x0 + x1) / 2;
     return `M${x0},${y0} C${m},${y0} ${m},${y1} ${x1},${y1} L${x1},${y1 + h} C${m},${y1 + h} ${m},${y0 + h} ${x0},${y0 + h} Z`;
@@ -60,7 +60,7 @@ export default function SectionTransitionFlow({ listas, transicoes }) {
       <ul className="flow-lista">
         {transicoes.map((t) => (
           <li key={t.id} className={t.id === '1-4' ? 'cumul' : ''}>
-            <strong>{t.id === '1-4' ? 'Primeira lista → lista de 438 (comparação direta)' : t.rotulo}</strong>
+            <strong>{t.id === '1-4' ? 'Primeira lista → última lista (comparação direta)' : t.rotulo}</strong>
             <span><b className="t-saiu">−{nInt(t.removidas.secoes)}</b> saíram</span>
             <span><b>{nInt(t.mantidas.secoes)}</b> ficaram</span>
             <span><b className="t-entrou">+{nInt(t.adicionadas.secoes)}</b> entraram</span>

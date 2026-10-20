@@ -42,7 +42,9 @@ const hist = { '1-2': { rem: [653, 45.77, 46.65], add: [16, 76.07, 19.34] }, '2-
 for (const [id, g] of Object.entries(hist)) {
   const t = h.transicoes.find((x) => x.id === id);
   for (const [k, nome] of [['rem', 'removidas'], ['add', 'adicionadas']]) {
-    confere(`histórico ${id} ${nome}: seções`, t[nome].secoes, g[k][0]);
+    // Removidas: contagem total (inclui as 10 sem resultado da 1ª lista). Adicionadas: só as com resultado do 1º turno
+    // (as seções novas da última lista não têm cruzamento e ficam fora das porcentagens).
+    confere(`histórico ${id} ${nome}: seções`, nome === 'adicionadas' ? t[nome].secoes - t[nome].semResultado : t[nome].secoes, g[k][0]);
     confere(`histórico ${id} ${nome}: Lula`, +(t[nome].lulaPct * 100).toFixed(2), g[k][1]);
     confere(`histórico ${id} ${nome}: Flávio`, +(t[nome].flavioPct * 100).toFixed(2), g[k][2]);
   }

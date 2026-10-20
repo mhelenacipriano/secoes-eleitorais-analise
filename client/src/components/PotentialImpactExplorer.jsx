@@ -31,7 +31,7 @@ export default function PotentialImpactExplorer({ listas }) {
       <div className="imp-controls">
         <label>Lista de seções
           <select value={id} onChange={(e) => { setId(Number(e.target.value)); setPref(null); setComp(null); }}>
-            {listas.map((x) => <option key={x.id} value={x.id}>{x.id === 4 ? 'Última lista analisada (438 seções)' : x.nome} — {nInt(x.eleitores)} eleitores</option>)}
+            {listas.map((x) => <option key={x.id} value={x.id}>{x.id === 4 ? 'Última lista analisada' : x.nome} — {nInt(x.eleitores)} eleitores</option>)}
           </select>
         </label>
         <label>

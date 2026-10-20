@@ -65,7 +65,7 @@ export function BarrasMargem({ itens, rotuloLargura }) {
   );
 }
 
-/** Linha ligando a margem da primeira lista à da lista de 438 em cada estado. */
+/** Linha ligando a margem da primeira lista à da última lista em cada estado. */
 export function Halteres({ estados }) {
   const [ref, w] = useWidth();
   const [box, tip, on, off] = useTip();
@@ -82,7 +82,7 @@ export function Halteres({ estados }) {
         {itens.map((e, i) => {
           const y = 14 + i * rowH;
           return (
-            <g key={e.uf} onMouseMove={on([e.uf, `18/10 · 11h: ${nPts(e.m1)} (${nInt(e.el1)} eleitores)`, `Lista de 438: ${nPts(e.m4)} (${nInt(e.el4)} eleitores)`])} onMouseLeave={off}>
+            <g key={e.uf} onMouseMove={on([e.uf, `18/10 · 11h: ${nPts(e.m1)} (${nInt(e.el1)} eleitores)`, `Última lista: ${nPts(e.m4)} (${nInt(e.el4)} eleitores)`])} onMouseLeave={off}>
               <rect x="0" y={y - 12} width={w} height={rowH} fill="transparent" />
               <text x="0" y={y + 4} className="strong">{e.uf}</text>
               <line x1={x(e.m1)} x2={x(e.m4)} y1={y} y2={y} stroke="var(--neutro)" strokeWidth="2" />

@@ -1,5 +1,8 @@
 // Aplica ao CSV consolidado a lista mais recente (CSV oficial em ISO-8859-1, separado por ";").
-// Confere que são as mesmas seções da última lista (v4) e atualiza os locais de votação que mudaram.
+// A lista mais recente vale por inteira, tenha ou não cruzamento com as demais listas e com os votos:
+//  - seções já conhecidas têm os locais de votação atualizados;
+//  - seções novas entram sem resultado do 1º turno (tem_voto=0), nunca como zero voto;
+//  - seções que saíram da lista deixam de constar nela (v4=0).
 // Uso: node scripts/aplicar-lista-recente.mjs server/data/fontes/secoes_eleitorais_alteradas_2t-regiao_2026.csv
 import fs from 'node:fs';
 import { parse } from 'csv-parse/sync';
@@ -11,23 +14,28 @@ const bruto = fs.readFileSync(destino, 'utf8');
 const crlf = bruto.includes('\r\n');
 const base = parse(bruto, { columns: true, skip_empty_lines: true });
 const novos = parse(new TextDecoder('latin1').decode(fs.readFileSync(arquivo)), { columns: true, delimiter: ';', skip_empty_lines: true });
+const cols = Object.keys(base[0]);
 
 const chave = (uf, m, z, s) => [uf, m, Number(z), Number(s)].join('|');
-const ultima = new Map(base.filter((r) => r.v4 === '1').map((r) => [chave(r.uf, r.municipio, r.zona, r.secao), r]));
+const porChave = new Map(base.map((r) => [chave(r.uf, r.municipio, r.zona, r.secao), r]));
 const nova = new Map(novos.map((r) => [chave(r.sg_uf, r.nm_municipio, r.nr_zona, r.nr_secao), r]));
-const faltam = [...nova.keys()].filter((k) => !ultima.has(k)), sobram = [...ultima.keys()].filter((k) => !nova.has(k));
-if (faltam.length || sobram.length) { console.error(`Conjuntos de seções diferentes: ${faltam.length} só no arquivo novo, ${sobram.length} só na última lista atual.`); process.exit(1); }
+if (nova.size !== novos.length) { console.error('Há seções repetidas no arquivo novo.'); process.exit(1); }
 
-let alterados = 0;
+let atualizados = 0, adicionados = 0, reativados = 0, retirados = 0;
 for (const [k, n] of nova) {
-  const r = ultima.get(k);
-  if (r.local_inicial !== n.nm_local_votacao_inicial || r.local_final !== n.nm_local_votacao_final) {
-    r.local_inicial = n.nm_local_votacao_inicial; r.local_final = n.nm_local_votacao_final; alterados++;
+  let r = porChave.get(k);
+  if (!r) {
+    r = Object.fromEntries(cols.map((c) => [c, '0']));
+    Object.assign(r, { uf: n.sg_uf, municipio: n.nm_municipio, zona: String(Number(n.nr_zona)), secao: String(Number(n.nr_secao)), local_inicial: n.nm_local_votacao_inicial, local_final: n.nm_local_votacao_final, v4: '1', el_v4: n.qt_eleitores, eleitores: n.qt_eleitores });
+    base.push(r); porChave.set(k, r); adicionados++; continue;
   }
-  if (Number(r.el_v4) !== Number(n.qt_eleitores)) { console.error(`Eleitores diferentes em ${k}`); process.exit(1); }
+  if (r.v4 !== '1') { r.v4 = '1'; reativados++; }
+  if (r.local_inicial !== n.nm_local_votacao_inicial || r.local_final !== n.nm_local_votacao_final) { r.local_inicial = n.nm_local_votacao_inicial; r.local_final = n.nm_local_votacao_final; atualizados++; }
+  r.el_v4 = n.qt_eleitores;
 }
-const cols = Object.keys(base[0]);
+for (const [k, r] of porChave) if (r.v4 === '1' && !nova.has(k)) { r.v4 = '0'; r.el_v4 = '0'; retirados++; }
+
 const esc = (v) => (/[,"\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
 const eol = crlf ? '\r\n' : '\n';
 fs.writeFileSync(destino, [cols.join(','), ...base.map((r) => cols.map((c) => esc(String(r[c]))).join(','))].join(eol) + eol);
-console.log(`${nova.size} seções conferidas; ${alterados} locais atualizados.`);
+console.log(`Lista mais recente: ${nova.size} seções. Locais atualizados: ${atualizados}; seções novas (sem resultado do 1º turno): ${adicionados}; reincluídas: ${reativados}; retiradas: ${retirados}.`);

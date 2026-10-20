@@ -4,7 +4,7 @@ import { BarraCandidatos, InfoTip, Legenda } from './ui.jsx';
 
 const GRUPOS = [['removidas', 'Retiradas', 'Estavam na lista anterior e não estão na nova.'], ['mantidas', 'Mantidas', 'Estão nas duas listas.'], ['adicionadas', 'Adicionadas', 'Não estavam na lista anterior e estão na nova.']];
 const ROTULO = { '1-2': 'Atualização 1', '2-3': 'Atualização 2', '3-4': 'Última lista', '1-4': 'Comparação direta' };
-const CURTO = { '1-2': '1ª → 2ª lista', '2-3': '2ª → 3ª lista', '3-4': '3ª → lista de 438', '1-4': '1ª → lista de 438' };
+const CURTO = { '1-2': '1ª → 2ª lista', '2-3': '2ª → 3ª lista', '3-4': '3ª → última lista', '1-4': '1ª → última lista' };
 
 /** Texto gerado a partir dos números: nunca atribui motivo às mudanças. */
 export function interpretar(t) {

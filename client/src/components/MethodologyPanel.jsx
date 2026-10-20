@@ -12,7 +12,7 @@ export default function MethodologyPanel({ meta, listas }) {
           <li>O perfil de votação é do <strong>1º turno</strong> (histórico). Não é previsão do 2º turno, e os votos do 2º turno (25/10/2026) não estão nestes dados.</li>
           <li><strong>Margem</strong> = % de Lula − % de Flávio Bolsonaro nos votos válidos do 1º turno, em pontos percentuais (pts). A margem de uma lista <em>não</em> é a margem nacional e a variação entre listas <em>não</em> é um “swing” eleitoral.</li>
           <li>Correlação não prova intenção ou causa. Parte das diferenças pode ser <strong>geográfica</strong>: as listas tendem a incluir municípios inteiros.</li>
-          <li>Dados ausentes são mantidos como ausentes. {nInt(meta.semResultado)} seções (Aracati/CE, Frankfurt e Praga) não têm resultado cruzado: contam nos eleitores, ficam fora das porcentagens e nunca viram “zero voto”.</li>
+          <li>Dados ausentes são mantidos como ausentes. {nInt(meta.semResultado)} seções não têm resultado do 1º turno cruzado (Aracati/CE, Frankfurt e Praga na primeira lista; Ipueiras/CE e Vigia/PA entraram na última lista): contam nos eleitores, ficam fora das porcentagens e nunca viram “zero voto”.</li>
         </ul>
       </section>
       <section className="card">

@@ -6,7 +6,7 @@ import { nInt } from '../format.js';
 const RELATORIOS = [
   { arq: 'relatorio_versoes_v1_v4_2t_2026.pdf', nome: 'Relatório das quatro listas e votos', desc: 'Margem por lista, efeito de cada troca, estados e municípios. É o relatório mais completo.' },
   { arq: 'relatorio_rodadas_secoes_2t_2026.pdf', nome: 'Evolução das listas', desc: 'Como a lista de seções encolheu e quais seções saíram ou entraram.' },
-  { arq: 'relatorio_secoes_alteradas_2t_2026.pdf', nome: 'Lista de 438 seções', desc: 'Porcentagem de votos por candidato e candidatos mais afetados na lista de 438.' },
+  { arq: 'relatorio_secoes_alteradas_2t_2026.pdf', nome: 'Última lista (versão anterior do relatório)', desc: 'Porcentagem de votos por candidato e candidatos mais afetados na última lista, na versão com 438 seções.' },
 ];
 
 export default function Metodologia({ meta }) {
