@@ -99,6 +99,7 @@ const resultado = {
   geradoEm: new Date().toISOString(), seed: 20261020, reamostras: B, permutacoes: P,
   conferencia: { comResultado: achou, iguaisAoArquivoCompleto: igual, semResultado: semVoto },
   totalSecoes: tse.size,
+  nacional: { lula: [...tse.values()].reduce((a, t) => a + t.l, 0), flavio: [...tse.values()].reduce((a, t) => a + t.f, 0), outros: [...tse.values()].reduce((a, t) => a + t.o, 0) },
   qualquerLista: analisar((x) => x.listas.length > 0),
   porLista: Object.fromEntries(IDS.map((id) => [id, analisar((x) => x.listas.includes(id))])),
 };

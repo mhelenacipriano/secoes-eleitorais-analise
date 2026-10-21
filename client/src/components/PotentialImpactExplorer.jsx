@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useApi } from '../api.js';
 import { useParam, useParamNum } from '../router.js';
 import { nInt, nPct } from '../format.js';
 import { InfoTip } from './ui.jsx';
@@ -62,6 +63,7 @@ export default function PotentialImpactExplorer({ listas }) {
   const pref = prefP === '' || !Number.isFinite(Number(prefP)) ? null : Number(prefP), setPref = (v) => setPrefP(v == null ? '' : v);
   const comp = compP === '' || !Number.isFinite(Number(compP)) ? null : Number(compP), setComp = (v) => setCompP(v == null ? '' : v);
   const [nac, setNac] = useParam('nac');
+  const ctrl = useApi('controle');   // só para o total nacional de votos do 1º turno
   const [inc, setInc] = useParamNum('inc', 10);   // quanto as suposições podem estar erradas, em pontos percentuais
   const prefEf = pref ?? observado, compEf = comp ?? compObs;
   const maxImp = Math.round(l.eleitores * 0.5), passo = Math.max(1, Math.round(l.eleitores / 400));
@@ -83,6 +85,10 @@ export default function PotentialImpactExplorer({ listas }) {
   const maxBar = Math.max(r.lulaPerde, r.flavioPerde, 1);
   const saldoTxt = (v) => (Math.abs(v) < 0.5 ? 'efeito nulo' : `${nInt(Math.abs(v))} votos a favor de ${v > 0 ? 'Lula' : 'Flávio Bolsonaro'}`);
   const de10 = (p) => Math.round(p * 10);
+  const nacL = ctrl.data?.nacional?.lula, nacF = ctrl.data?.nacional?.flavio, diff1 = nacL != null ? nacL - nacF : null;
+  // quantas simulações têm saldo, na direção do candidato que está à frente, maior que a diferença nacional do 1º turno
+  const contra = diff1 == null ? 0 : r.saldos.filter((v) => (diff1 > 0 ? -v : v) > Math.abs(diff1)).length / N_SIM;
+  const pctSim = (p) => (p === 0 ? 'nenhuma' : p < 0.01 ? 'menos de 1%' : nPct(p, 0));
 
   return (
     <div className="impacto" aria-label="Exercício hipotético">
@@ -141,9 +147,17 @@ export default function PotentialImpactExplorer({ listas }) {
               </p>
             </>
           )}
-        <label className="nac">Quer comparar com a diferença final de votos entre os dois candidatos? <input inputMode="numeric" placeholder="Ex.: informe o total verificado" value={nac} onChange={(e) => setNac(e.target.value)} aria-label="Diferença final de votos entre os candidatos (opcional)" /></label>
-        {nacional > 0 && <p className="imp-nac">Com estas suposições, o saldo de {nInt(Math.abs(r.liquido))} votos equivale a <strong>{nPct(Math.abs(r.liquido) / nacional, 2)}</strong> da diferença que você informou. Este site não tem totais nacionais verificados; o valor foi digitado por você.</p>}
-        {!nacional && <p className="note">Os dados deste site cobrem só as seções listadas, sem o total de votos do país. Por isso não calculamos o efeito no resultado nacional nem apontamos um vencedor.</p>}
+        <h3 className="imp-tit">Isso pesaria na diferença nacional?</h3>
+        {diff1 != null && (
+          <p className="imp-liq">
+            No 1º turno, no país todo, {diff1 > 0 ? 'Lula' : 'Flávio Bolsonaro'} ficou à frente por <strong>{nInt(Math.abs(diff1))} votos</strong> ({nInt(nacL)} contra {nInt(nacF)}).
+            O saldo típico desta simulação ({nInt(Math.abs(r.p50))} votos {r.p50 > 0 ? 'para Lula' : 'para Flávio'}) equivale a <strong>{nPct(Math.abs(r.p50) / Math.abs(diff1), 2)}</strong> dessa diferença.
+            {inc > 0 && <> Em {pctSim(contra)} das simulações o efeito foi grande o bastante para {diff1 > 0 ? 'passar a vantagem de Lula' : 'passar a vantagem de Flávio'} no 1º turno, <em>mantendo todo o resto igual</em>.</>}
+          </p>
+        )}
+        <label className="nac">Prefere comparar com outra diferença, por exemplo a que você espera no 2º turno? <input inputMode="numeric" placeholder="Ex.: 1.500.000" value={nac} onChange={(e) => setNac(e.target.value)} aria-label="Outra diferença de votos entre os candidatos (opcional)" /></label>
+        {nacional > 0 && <p className="imp-nac">Com estas suposições, o saldo típico de {nInt(Math.abs(r.p50))} votos equivale a <strong>{nPct(Math.abs(r.p50) / nacional, 2)}</strong> da diferença que você informou, e o saldo desta simulação central ({nInt(Math.abs(r.liquido))}) a {nPct(Math.abs(r.liquido) / nacional, 2)}. O valor foi digitado por você; o site não sabe qual será a diferença do 2º turno.</p>}
+        <p className="note">É uma comparação de tamanho, não uma previsão do 2º turno: a diferença final dependerá de quem votar, em quem, e de muito mais do que as seções listadas.</p>
       </div>
 
       <ul className="imp-notas">
