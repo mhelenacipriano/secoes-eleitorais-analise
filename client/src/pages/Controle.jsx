@@ -41,30 +41,22 @@ export default function Controle() {
   const c = st.data, q = c.qualquerLista;
   const linhas = [['Todas as listas', q], ...todasListas().map((l) => [l.label, c.porLista[l.id]])].filter(([, r]) => r)
     .map(([nome, r]) => ({ nome, est: r.diferenca, ic: r.ic95, icIng: r.icIngenuo, n: r.alteradas, p: r.pPermutacao, bruta: r.mediaBruta }));
-  const inclui0 = q.ic95[0] <= 0 && q.ic95[1] >= 0;
   return (
     <div className="stack">
-      <Card titulo="As seções que mudaram votaram diferente das outras?" nota="Comparamos, no 1º turno, as seções que aparecem nas listas do TSE com as outras seções da mesma cidade, que não mudaram de local (o grupo de comparação).">
-        <div className="insight">
-          <p><strong>Resumo:</strong> no país todo, as seções que mudaram deram mais vantagem a Lula ({f(q.margemAlteradas)}) do que as demais ({f(q.margemControle)}): uma diferença de {f(q.mediaBruta)}. Mas isso acontece porque as mudanças se concentram em certas cidades.</p>
-          <p>Comparando só seções <strong>da mesma cidade</strong>, a diferença praticamente some: <strong>{f(q.diferenca)}</strong>, com margem de erro de {f(q.ic95[0])} a {f(q.ic95[1])}. {inclui0 ? 'Como essa faixa inclui o zero, não há evidência de que as seções que mudaram votassem diferente das vizinhas.' : 'Essa faixa não inclui o zero.'}</p>
-        </div>
+      <Card titulo="As seções alteradas votaram diferente das demais do mesmo município?" nota="Comparamos a margem (Lula − Flávio, 1º turno) das seções que aparecem nas listas com a de todas as outras seções do mesmo município, que não aparecem em nenhuma lista (grupo de controle).">
+        <p>
+          Olhando o país inteiro, as seções alteradas têm margem média de <strong>{f(q.margemAlteradas)}</strong> e as demais, <strong>{f(q.margemControle)}</strong>: uma diferença bruta de <strong>{f(q.mediaBruta)}</strong>.
+          Mas as alteradas estão concentradas em certos municípios. Comparando apenas seções <em>do mesmo município</em>, a diferença cai para <strong>{f(q.diferenca)}</strong> (IC 95%: {f(q.ic95[0])} a {f(q.ic95[1])}), {q.ic95[0] <= 0 && q.ic95[1] >= 0 ? 'um intervalo que inclui o zero: não há evidência de que as alteradas votassem diferente das vizinhas.' : 'um intervalo que não inclui o zero.'}
+        </p>
         <Floresta linhas={linhas} />
-        <p className="note">O ponto é a diferença média entre as seções que mudaram e as outras da mesma cidade; a linha é a faixa provável (95%). Se a linha cruza o zero, a diferença pode ser só acaso. “pts” são pontos percentuais de vantagem (Lula − Flávio) entre os votos válidos.</p>
+        <p className="note">Ponto vermelho: diferença média dentro do município. Linha vermelha: intervalo de 95% com bootstrap por município (reamostra municípios inteiros, respeitando que seções vizinhas se parecem). A diferença bruta (+5,5 pts no total) tem intervalo bem estreito se cada seção for tratada como independente, mas isso não leva em conta que as alteradas se concentram em certos municípios.</p>
       </Card>
-      <Card titulo="Números por lista" nota={`Base: ${nInt(c.totalSecoes)} seções do 1º turno; ${nInt(q.municipios)} cidades têm seções que mudaram e seções que não mudaram.`}>
+      <Card titulo="Números por lista" nota={`Base: ${nInt(c.totalSecoes)} seções do 1º turno; ${nInt(q.municipios)} municípios têm seções alteradas e de controle.`}>
         <div className="tabela-card"><table>
-          <thead><tr><th>Lista</th><th>Seções que mudaram</th><th>Diferença no país todo</th><th>Comparando na mesma cidade</th><th>Faixa provável</th></tr></thead>
-          <tbody>{linhas.map((l) => <tr key={l.nome}><td>{l.nome}</td><td>{nInt(l.n)}</td><td>{f(l.bruta)}</td><td>{f(l.est)}</td><td>{f(l.ic[0])} a {f(l.ic[1])}</td></tr>)}</tbody>
+          <thead><tr><th>Lista</th><th>Seções alteradas</th><th>Diferença bruta</th><th>Dentro do município</th><th>IC 95% (cluster)</th><th>p (permutação)</th></tr></thead>
+          <tbody>{linhas.map((l) => <tr key={l.nome}><td>{l.nome}</td><td>{nInt(l.n)}</td><td>{f(l.bruta)}</td><td>{f(l.est)}</td><td>{f(l.ic[0])} a {f(l.ic[1])}</td><td>{l.p.toLocaleString('pt-BR')}</td></tr>)}</tbody>
         </table></div>
-        <p className="note">Isto descreve como as seções votaram no 1º turno. Não prova que a mudança de local tenha alterado, ou deixado de alterar, o resultado.</p>
-        <details className="ajuda"><summary>Detalhes técnicos</summary>
-          <div>
-            <p>A diferença “na mesma cidade” é uma média entre cidades, ponderada pelo número de seções que mudaram em cada uma. A faixa provável vem de um sorteio repetido ({nInt(c.reamostras)} vezes) em que cidades inteiras são reamostradas, o que respeita o fato de que seções vizinhas se parecem.</p>
-            <p>Teste de permutação (embaralhar quais seções “mudaram”, dentro de cada cidade): {linhas.map((l) => `${l.nome} p=${l.p.toLocaleString('pt-BR')}`).join('; ')}. Esse teste trata cada seção como independente, e por isso pode dar valor pequeno mesmo quando a faixa provável inclui o zero; use a faixa como referência.</p>
-            <p>Base de dados: votação do 1º turno de todas as seções do país (TSE), cruzada com as listas. Os votos de {nInt(c.conferencia.iguaisAoArquivoCompleto)} seções que já tínhamos conferem integralmente com o arquivo completo.</p>
-          </div>
-        </details>
+        <p className="note">O teste de permutação embaralha os rótulos dentro de cada município e trata as seções como trocáveis; ele ignora que seções do mesmo local de votação se parecem, então pode sair pequeno mesmo quando o intervalo por cluster inclui o zero. Prefira o intervalo. Este é um retrato descritivo, não prova de causa nem de efeito sobre o resultado.</p>
       </Card>
     </div>
   );

@@ -28,8 +28,6 @@ const sendOrCsv = (nome, fn) => (req, res) => {
 
 const controle = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'controle.json'), 'utf8')); } catch { return null; } })();
 app.get('/api/controle', (_req, res) => (controle ? res.json(controle) : res.status(404).json({ erro: 'controle.json não gerado' })));
-const mapaMun = (() => { try { return JSON.parse(fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'mapa-municipios.json'), 'utf8')); } catch { return null; } })();
-app.get('/api/mapa-municipios', (_req, res) => (mapaMun ? res.json(mapaMun) : res.status(404).json({ erro: 'mapa-municipios.json não gerado' })));
 app.get('/api/meta', (_req, res) => res.json(meta()));
 app.get('/api/resumo', sendOrCsv('resumo-por-lista', resumo));
 app.get('/api/mudancas', sendOrCsv('mudancas-entre-listas', mudancas));
