@@ -49,7 +49,7 @@ export default function Controle() {
           Mas as alteradas estão concentradas em certos municípios. Comparando apenas seções <em>do mesmo município</em>, a diferença cai para <strong>{f(q.diferenca)}</strong> (IC 95%: {f(q.ic95[0])} a {f(q.ic95[1])}), {q.ic95[0] <= 0 && q.ic95[1] >= 0 ? 'um intervalo que inclui o zero: não há evidência de que as alteradas votassem diferente das vizinhas.' : 'um intervalo que não inclui o zero.'}
         </p>
         <Floresta linhas={linhas} />
-        <p className="note">Ponto vermelho: diferença média dentro do município. Linha vermelha: intervalo de 95% com bootstrap por município (reamostra municípios inteiros, respeitando que seções vizinhas se parecem). A diferença bruta (+5,5 pts no total) tem intervalo bem estreito se cada seção for tratada como independente, mas isso não leva em conta que as alteradas se concentram em certos municípios.</p>
+        <p className="note">Ponto vermelho: diferença média dentro do município. Linha vermelha: intervalo de 95% com bootstrap por município (reamostra municípios inteiros, respeitando que seções vizinhas se parecem). A diferença bruta (+5,5 pontos percentuais no total) tem intervalo bem estreito se cada seção for tratada como independente, mas isso não leva em conta que as alteradas se concentram em certos municípios.</p>
       </Card>
       <Card titulo="Números por lista" nota={`Base: ${nInt(c.totalSecoes)} seções do 1º turno; ${nInt(q.municipios)} municípios têm seções alteradas e de controle.`}>
         <div className="tabela-card"><table>

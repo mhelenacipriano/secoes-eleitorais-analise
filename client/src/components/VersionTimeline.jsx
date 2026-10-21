@@ -17,6 +17,8 @@ export default function VersionTimeline({ listas, selecionada, onSelect }) {
     refs.current[j]?.focus();
   };
   return (
+    <>
+    <p className="note tl-legenda">Número colorido: quanto Lula (vermelho) ou Flávio (azul) ficou à frente no 1º turno, somando todas as seções daquela versão da lista.</p>
     <div className="timeline" role="tablist" aria-label="Versões da lista de seções alteradas">
       {listas.map((l, i) => {
         const ativa = l.id === selecionada, ultima = ehUltima(l.id);
@@ -33,5 +35,6 @@ export default function VersionTimeline({ listas, selecionada, onSelect }) {
         );
       })}
     </div>
+    </>
   );
 }

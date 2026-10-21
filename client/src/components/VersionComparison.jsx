@@ -32,7 +32,7 @@ export default function VersionComparison({ lista, transicao, anterior, onSwipe 
       </div>
       <Legenda />
       <BarraCandidatos lula={l.lulaPct} flavio={l.flavioPct} outros={l.outrosPct} />
-      <p className="vc-margem">Dentro desta lista, no 1º turno: <strong className={l.margem >= 0 ? 'pos' : 'neg'}>{l.margem >= 0 ? 'Lula' : 'Flávio'} {nPts(Math.abs(l.margem)).replace('−', '+')}</strong> de diferença nos votos válidos.</p>
+      <p className="vc-margem">Somando todas as seções desta lista, no 1º turno: <strong className={l.margem >= 0 ? 'pos' : 'neg'}>{l.margem >= 0 ? 'Lula' : 'Flávio'} ficou {nPts(Math.abs(l.margem)).replace('−', '').replace('+', '')} à frente</strong> de {l.margem >= 0 ? 'Flávio' : 'Lula'} nos votos válidos.</p>
       <p className="vc-texto">{FRASE(l, transicao, anterior)}</p>
       <button className="btn" aria-expanded={detalhes} onClick={() => setDetalhes((d) => !d)}>{detalhes ? 'Ocultar detalhes' : 'Ver detalhes'}</button>
       {detalhes && (
