@@ -122,9 +122,6 @@ button, select, input { font: inherit; color: inherit; }
 .flow-legenda { display: flex; gap: 6px 18px; flex-wrap: wrap; align-items: center; font-size: .86rem; color: var(--muted); margin-bottom: 10px; }
 .chart { position: relative; width: 100%; } .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .chart text { fill: var(--muted); font-size: 11px; } .chart text.strong { fill: var(--fg); font-weight: 600; }
-.flow .col { fill: var(--fg); opacity: .85; }
-.r-mant { fill: var(--mant); opacity: .45; transition: opacity .2s; } .r-saiu { fill: var(--saiu); opacity: .55; } .r-entrou { fill: var(--entrou); opacity: .8; }
-.flux:hover .r-mant, .flux.on .r-mant { opacity: .7; } .flux { outline: none; cursor: default; }
 .t-saiu { fill: var(--saiu) !important; font-weight: 600; } .t-entrou { fill: var(--entrou) !important; font-weight: 600; }
 b.t-saiu { color: var(--saiu); } b.t-entrou { color: var(--entrou); }
 .flow-lista { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
