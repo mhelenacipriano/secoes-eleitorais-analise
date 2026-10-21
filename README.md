@@ -16,7 +16,7 @@ npm run verificar   # recalcula tudo do CSV e compara com a API
 
 ## Dados
 
-`server/data/secoes_v.csv` consolida várias listas (18/10 11h, 18/10 17h, 19/10 11h, 20/10 13h59 e 20/10 15h27 — as duas últimas do site original do TSE, painel Seções alteradas) e os votos do 1º turno. A lista mais recente, de 20/10 15h27 (453 seções, baixada em 20/10 às 17h46), vale por inteira, mesmo para seções sem cruzamento com as demais listas ou com os votos (entram como "sem resultado"). Ela vem de `server/data/fontes/secoes_eleitorais_alteradas_2t-pais_2026_lista5.csv` e é aplicada com `node scripts/aplicar-lista-recente.mjs <csv> <número da lista>` (uma lista nova cria as colunas dela sem alterar as anteriores) (confere que são as mesmas seções e atualiza os locais de votação).
+`server/data/secoes_v.csv` consolida várias listas (a relação, com data e hora de cada uma, está em `server/data/listas.json` e se atualiza sozinha a cada lista nova) e os votos do 1º turno. A lista mais recente vale por inteira, mesmo para seções sem cruzamento com as demais listas ou com os votos (entram como "sem resultado"). Ela vem de `server/data/fontes/secoes_eleitorais_alteradas_2t-pais_2026_lista5.csv` e é aplicada com `node scripts/aplicar-lista-recente.mjs <csv> <número da lista>` (uma lista nova cria as colunas dela sem alterar as anteriores) (confere que são as mesmas seções e atualiza os locais de votação).
 
 ## Navegação
 
@@ -70,3 +70,6 @@ bash scripts/agendar-mac.sh --agora                                      # testa
 bash scripts/agendar-mac.sh --remover                                    # desinstala
 ```
 Log em `~/Library/Logs/secoes-eleitorais-atualizacao.log`. Se o Mac estiver dormindo no horário, roda quando acordar. O git precisa dar push sem pedir senha.
+
+### O que se atualiza a cada lista nova
+`scripts/atualizar-tudo.mjs` (pelo GitHub nos horários agendados, ou no Mac) refaz tudo de uma vez: `listas.json` (rótulo, data de publicação e de download), `secoes_v.csv`, a conferência dos números (`npm run verificar`), o grupo de controle (`controle.json`, baixa a votação do 1º turno) e `painel.json` (quando conferimos o painel do TSE e o que ele informa de última e próxima atualização). Os textos, rótulos e avisos do site são lidos desses arquivos. Mesmo sem lista nova, cada conferência atualiza `painel.json`.

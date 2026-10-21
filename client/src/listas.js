@@ -2,6 +2,10 @@
 // definirListas() é chamado uma vez, assim que o meta chega, antes de qualquer componente que dependa disso ser desenhado.
 let LISTAS = [];
 export const definirListas = (l) => { LISTAS = l || []; };
+// Última conferência do painel do TSE: { verificadoEm, ultimaAtualizacao, proximaAtualizacao } (pode faltar)
+let PAINEL = null;
+export const definirPainel = (p) => { PAINEL = p || null; };
+export const painel = () => PAINEL;
 export const todasListas = () => LISTAS;
 export const idsListas = () => LISTAS.map((l) => l.id);
 export const ultimaLista = () => LISTAS[LISTAS.length - 1] || { id: 0, label: '', nome: '' };

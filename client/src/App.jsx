@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApi } from './api.js';
 import { useRota } from './router.js';
-import { definirListas } from './listas.js';
+import { definirListas, definirPainel } from './listas.js';
 import Home from './pages/Home.jsx';
 import Evolucao from './pages/Evolucao.jsx';
 import Impacto from './pages/Impacto.jsx';
@@ -21,7 +21,7 @@ export default function App() {
   const { caminho, filtros, ir } = useRota();
   const [menu, setMenu] = useState(false);
   const meta = useApi('meta');
-  if (meta.data) definirListas(meta.data.listas);   // rótulos e datas das listas vêm do servidor
+  if (meta.data) { definirListas(meta.data.listas); definirPainel(meta.data.painel); }   // rótulos e datas das listas vêm do servidor
   const [raiz, sub] = caminho.split('/');
   const pagina = NAV.some(([id]) => id === raiz) ? raiz : '';
   const setFiltros = (f) => ir(caminho, f, { topo: false });

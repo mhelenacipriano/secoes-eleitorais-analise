@@ -11,6 +11,8 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 export const LISTAS = JSON.parse(fs.readFileSync(path.join(dir, 'data', 'listas.json'), 'utf8'));
 export const IDS = LISTAS.map((l) => l.id);
 export const ULTIMA = LISTAS[LISTAS.length - 1].id;
+// Conferência mais recente do painel do TSE (server/data/painel.json, escrito por scripts/atualizar-tudo.mjs); ausente = só os dados das listas
+const PAINEL = (() => { try { return JSON.parse(fs.readFileSync(path.join(dir, 'data', 'painel.json'), 'utf8')); } catch { return null; } })();
 
 const num = (x) => Number(x) || 0;
 const rows = parse(fs.readFileSync(path.join(dir, 'data', 'secoes_v.csv')), { columns: true, skip_empty_lines: true }).map((r) => ({
@@ -65,7 +67,7 @@ function somar(rs, k) {
 export function meta() {
   const municipios = {};
   for (const r of rows) (municipios[r.uf] ||= new Set()).add(r.municipio);
-  return { listas: LISTAS, ufs: [...new Set(rows.map((r) => r.uf))].sort(), totalSecoes: rows.length,
+  return { listas: LISTAS, painel: PAINEL, ufs: [...new Set(rows.map((r) => r.uf))].sort(), totalSecoes: rows.length,
     semResultado: rows.filter((r) => !temResultado(r)).length,
     // municípios com seções sem resultado do 1º turno cruzado (para o texto da metodologia), com a primeira lista em que aparecem
     semResultadoMunicipios: [...rows.filter((r) => !temResultado(r)).reduce((m, r) => { const k = `${r.uf}:${r.municipio}`; const o = m.get(k) || { uf: r.uf, municipio: r.municipio, secoes: 0, primeira: r.em.indexOf(true) + 1 }; o.secoes++; return m.set(k, o); }, new Map()).values()],
