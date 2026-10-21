@@ -345,3 +345,29 @@ h3.imp-tit { font-size: 1rem; margin: 0; }
 .ta-como-corpo p { margin: 8px 0 0; } .ta-como-corpo ul { margin: 8px 0 0; padding-left: 1.1rem; display: grid; gap: 4px; }
 @media print { .ta-como:not([open]) > .ta-como-corpo { display: block; } }
 .ta-como summary { justify-content: space-between; list-style: none; } .ta-como summary::-webkit-details-marker { display: none; } .ta-como summary::after { content: "Ver detalhes ▾"; font-weight: 500; color: var(--muted); font-size: .8rem; } .ta-como[open] summary::after { content: "Ocultar ▴"; }
+
+/* simulador do 2º turno: blocos de controle, controles deslizantes de duas cores, botões em pílula e cartões de chance */
+.imp-bloco { display: grid; gap: 4px; position: relative; }
+.imp-bloco .imp-tit { font-size: 1rem; margin: 0 0 2px; }
+.imp-valor { font-weight: 700; font-size: 1.05rem; }
+.imp-split { display: flex; justify-content: space-between; font-size: 1.05rem; margin: 2px 0; } .imp-split .mudo { color: var(--muted); }
+.imp-bloco .imp-escala { position: relative; min-height: 1.1rem; } .imp-bloco .imp-escala small { font-size: .75rem; }
+.btn-pilula { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 16px; margin-top: 6px; width: fit-content; max-width: 100%; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--fg); font-size: .88rem; line-height: 1.3; }
+.btn-pilula:hover { border-color: var(--lula); } .btn-pilula:focus-visible { outline: 2px solid var(--lula); outline-offset: 2px; } .btn-pilula span { color: var(--lula); font-weight: 700; }
+:root { --trilho: 8px; --polegar: 24px; }
+input.ctl { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; margin: 0; background: transparent; outline: none; }
+input.ctl.uni::-webkit-slider-runnable-track { height: var(--trilho); border-radius: 4px; background: linear-gradient(90deg, var(--lula) 0 var(--p, 5%), var(--line) var(--p, 5%) 100%); }
+input.ctl.uni::-moz-range-track { height: var(--trilho); border-radius: 4px; background: linear-gradient(90deg, var(--lula) 0 var(--p, 5%), var(--line) var(--p, 5%) 100%); }
+input.ctl.duo::-webkit-slider-runnable-track { height: var(--trilho); border-radius: 4px; background: linear-gradient(90deg, var(--lula) 0 var(--p, 54%), transparent var(--p, 54%) 100%), repeating-linear-gradient(135deg, var(--flavio) 0 5px, #0006 5px 7px); }
+input.ctl.duo::-moz-range-track { height: var(--trilho); border-radius: 4px; background: linear-gradient(90deg, var(--lula) 0 var(--p, 54%), transparent var(--p, 54%) 100%), repeating-linear-gradient(135deg, var(--flavio) 0 5px, #0006 5px 7px); }
+.dual input.ctl::-webkit-slider-runnable-track { height: var(--trilho); background: transparent; } .dual input.ctl::-moz-range-track { height: var(--trilho); background: transparent; }
+input.ctl::-webkit-slider-thumb { -webkit-appearance: none; width: var(--polegar); height: var(--polegar); margin-top: calc((var(--trilho) - var(--polegar)) / 2); border-radius: 50%; background: #fff; border: 3px solid var(--fg); box-shadow: 0 1px 4px #0006; cursor: pointer; pointer-events: auto; }
+input.ctl::-moz-range-thumb { width: calc(var(--polegar) - 6px); height: calc(var(--polegar) - 6px); border-radius: 50%; background: #fff; border: 3px solid var(--fg); cursor: pointer; pointer-events: auto; }
+input.ctl:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--lula); outline-offset: 2px; }
+.dual { position: relative; height: 28px; margin: 4px 0; }
+.dual input.ctl { position: absolute; left: 0; top: 0; pointer-events: none; }
+.dual::before { content: ""; position: absolute; left: 0; right: 0; top: calc((28px - var(--trilho)) / 2); height: var(--trilho); border-radius: 4px; background: linear-gradient(90deg, var(--lula) 0 var(--a, 40%), var(--neutro) var(--a, 40%) var(--b, 60%), transparent var(--b, 60%) 100%), repeating-linear-gradient(135deg, var(--flavio) 0 5px, #0006 5px 7px); }
+.imp-avancado summary { cursor: pointer; font-weight: 600; min-height: 36px; display: flex; align-items: center; }
+.imp-kpis { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+.imp-kpis .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 2px; } .imp-kpis .kpi b { font-size: 1.7rem; line-height: 1.1; } .imp-kpis .kpi span, .imp-kpis .kpi small { font-size: .8rem; color: var(--muted); }
+.rel { position: relative; } .imp-marca { position: absolute; top: 4px; width: 2px; height: 20px; margin-left: -1px; border-radius: 1px; background: var(--fg2); pointer-events: none; }

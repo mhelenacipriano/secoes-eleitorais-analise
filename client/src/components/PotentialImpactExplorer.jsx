@@ -4,166 +4,183 @@ import { useParam, useParamNum } from '../router.js';
 import { nInt, nPct } from '../format.js';
 import { InfoTip } from './ui.jsx';
 import { useWidth } from './Charts.jsx';
-import { ehUltima } from '../listas.js';
+import { ultimaLista } from '../listas.js';
 
 const dois = (l) => (l.lula + l.flavio ? l.lula / (l.lula + l.flavio) : 0.5);
+const limita = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
-// Simulações: sorteamos 4.000 combinações de "quantos votariam" e "quantos votariam em Lula" em torno dos valores escolhidos.
-// Os sorteios (normais padrão) são gerados uma vez, com semente fixa: o resultado é o mesmo a cada visita e o gráfico não "pisca" ao mexer nos controles.
+// 4.000 simulações. Os sorteios (normais padrão) são gerados uma vez, com semente fixa: o resultado é o mesmo a cada visita e o gráfico não "pisca" ao mexer nos controles.
 const N_SIM = 4000;
 const SORTEIOS = (() => {
   let s = 20261020;
   const rnd = () => { s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
   const normal = () => Math.sqrt(-2 * Math.log(1 - rnd())) * Math.cos(2 * Math.PI * rnd());
-  return Array.from({ length: N_SIM }, () => [normal(), normal()]);
+  return Array.from({ length: N_SIM }, () => [normal(), normal(), normal(), normal(), normal(), normal()]);
 })();
-const limita = (v) => Math.min(100, Math.max(0, v));
-const BINS = 32;
 
-/** Histograma dos saldos simulados: à direita, os casos em que Flávio perderia mais votos (favorece Lula); à esquerda, o inverso. */
-function GraficoSimulacoes({ saldos, p10, p50, p90 }) {
+/** Resultado do 2º turno (Lula − Flávio, em votos) em cada simulação, ordenado. Parte dos votos do 1º turno do país todo (nac). */
+function simular(nac, { imp, comp, pref, tl, tf, inc }) {
+  const dp = inc / 100;
+  const out = SORTEIOS.map(([z0, z1, z2, z3, z4, z5]) => {
+    let a = limita(tl / 100 + z0 * dp * 2), b = limita(tf / 100 + z1 * dp * 2);
+    const t = a + b; if (t > 1) { a /= t; b /= t; }                      // quem vota em Lula + em Flávio nunca passa de 100% dos "outros"
+    const ab = 0.02 + z2 * dp * 0.4, choque = z3 * dp * 0.5;             // abstenção extra no 2º turno e um "choque" que favorece um dos lados
+    const l = nac.lula * (1 - limita(ab - choque, 0, 0.5)) + nac.outros * a;
+    const f = nac.flavio * (1 - limita(ab + choque, 0, 0.5)) + nac.outros * b;
+    const naoVotam = imp * limita(comp / 100 + z4 * dp), pl = limita(pref / 100 + z5 * dp);
+    return (l - naoVotam * pl) - (f - naoVotam * (1 - pl));
+  });
+  return out.sort((x, y) => x - y);
+}
+
+const BINS = 40;
+const txtSaldo = (v) => (Math.abs(v) < 500 ? 'praticamente empate' : `${nInt(Math.abs(v))} votos a favor de ${v > 0 ? 'Lula' : 'Flávio'}`);
+
+/** Histograma dos resultados simulados; o contorno tracejado é o cenário sem ninguém impedido. */
+function GraficoSimulacoes({ cen, base }) {
   const [ref, w] = useWidth();
-  const lo = saldos[0], hi = saldos[saldos.length - 1], esq = 8, dir = 8, topo = 14, base = 44, H = 200;
-  const eixoLo = Math.min(lo, 0), eixoHi = Math.max(hi, 0), larg = eixoHi - eixoLo || 1;
-  const x = (v) => esq + ((v - eixoLo) / larg) * (w - esq - dir);
-  const bins = Array.from({ length: BINS }, () => 0);
-  for (const v of saldos) bins[Math.min(BINS - 1, Math.floor(((v - eixoLo) / larg) * BINS))]++;
-  const max = Math.max(...bins), bw = (w - esq - dir) / BINS;
-  const txt = (v) => (Math.abs(v) < 0.5 ? 'efeito nulo' : `${nInt(Math.abs(v))} votos a favor de ${v > 0 ? 'Lula' : 'Flávio'}`);
+  const H = 230, esq = 8, dir = 8, topo = 16, rodape = 52;
+  const lo = Math.min(cen[0], base[0]), hi = Math.max(cen[N_SIM - 1], base[N_SIM - 1]), larg = hi - lo || 1;
+  const hist = (a) => { const c = Array(BINS).fill(0); for (const v of a) c[Math.min(BINS - 1, Math.floor(((v - lo) / larg) * BINS))]++; return c; };
+  const hc = hist(cen), hb = hist(base), mx = Math.max(...hc, ...hb), bw = (w - esq - dir) / BINS;
+  const x = (v) => esq + ((v - lo) / larg) * (w - esq - dir), y = (n) => H - rodape - (n / mx) * (H - topo - rodape);
+  const q = (p) => cen[Math.floor(p * N_SIM)];
   return (
     <div ref={ref}>
-      <svg width="100%" viewBox={`0 0 ${w} ${H}`} role="img" aria-label={`Resultado de ${nInt(N_SIM)} simulações. Caso típico: ${txt(p50)}. Em 8 de cada 10 simulações, entre ${txt(p10)} e ${txt(p90)}.`}>
+      <svg width="100%" viewBox={`0 0 ${w} ${H}`} role="img" aria-label={`Resultado de ${nInt(N_SIM)} simulações do 2º turno. Caso típico: ${txtSaldo(q(0.5))}. Em 8 de cada 10 simulações, entre ${txtSaldo(q(0.1))} e ${txtSaldo(q(0.9))}.`}>
         <defs><pattern id="hachSim" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="var(--flavio)" /><rect width="2.2" height="6" fill="var(--hachura)" /></pattern></defs>
-        {bins.map((n, i) => {
-          const v0 = eixoLo + (i / BINS) * larg, v1 = eixoLo + ((i + 1) / BINS) * larg, h = (n / max) * (H - topo - base), meio = (v0 + v1) / 2;
-          return <rect key={i} x={esq + i * bw + 0.5} y={H - base - h} width={Math.max(1, bw - 1)} height={h} rx="2" fill={meio >= 0 ? 'var(--lula)' : 'url(#hachSim)'}><title>{`${nInt(n)} de ${nInt(N_SIM)} simulações deram entre ${txt(v0)} e ${txt(v1)}`}</title></rect>;
+        {hc.map((n, i) => {
+          const meio = lo + ((i + 0.5) / BINS) * larg;
+          return <rect key={i} x={esq + i * bw + 0.5} y={y(n)} width={Math.max(1, bw - 1)} height={H - rodape - y(n)} rx="2" fill={meio > 0 ? 'var(--lula)' : 'url(#hachSim)'}><title>{`${nInt(n)} de ${nInt(N_SIM)} simulações`}</title></rect>;
         })}
-        <line x1={esq} x2={w - dir} y1={H - base} y2={H - base} stroke="var(--line)" />
-        <line x1={x(0)} x2={x(0)} y1={topo - 4} y2={H - base + 6} stroke="var(--fg)" strokeDasharray="4 3" />
-        <text x={x(0)} y={topo - 5} textAnchor="middle" fontSize="11" fill="var(--muted)">sem efeito</text>
-        <line x1={x(p50)} x2={x(p50)} y1={topo + 6} y2={H - base} stroke="var(--fg)" strokeWidth="3" />
-        <rect x={x(p10)} y={H - base + 12} width={Math.max(2, x(p90) - x(p10))} height="6" rx="3" fill="var(--fg2)"><title>{`Em 8 de cada 10 simulações: de ${txt(p10)} a ${txt(p90)}`}</title></rect>
-        <text x={esq} y={H - 8} fontSize="11.5" fill="var(--flavio)">← favorece Flávio</text>
-        <text x={w - dir} y={H - 8} textAnchor="end" fontSize="11.5" fill="var(--lula)">favorece Lula →</text>
+        <polyline fill="none" stroke="var(--fg)" strokeWidth="1.6" strokeDasharray="4 3" points={hb.map((n, i) => `${esq + (i + 0.5) * bw},${y(n)}`).join(' ')} />
+        <line x1={esq} x2={w - dir} y1={H - rodape} y2={H - rodape} stroke="var(--line)" />
+        {lo < 0 && hi > 0 && <><line x1={x(0)} x2={x(0)} y1={topo - 6} y2={H - rodape + 6} stroke="var(--fg)" strokeWidth="1.5" /><text x={x(0)} y={topo - 6} textAnchor="middle" fontSize="11" fill="var(--muted)">empate</text></>}
+        <line x1={x(q(0.5))} x2={x(q(0.5))} y1={topo + 6} y2={H - rodape} stroke="var(--fg)" strokeWidth="3" />
+        <rect x={x(q(0.1))} y={H - rodape + 12} width={Math.max(2, x(q(0.9)) - x(q(0.1)))} height="6" rx="3" fill="var(--fg2)"><title>{`Em 8 de cada 10 simulações: de ${txtSaldo(q(0.1))} a ${txtSaldo(q(0.9))}`}</title></rect>
+        <text x={esq} y={H - 8} fontSize="12" fill="var(--flavio)">← Flávio na frente</text>
+        <text x={w - dir} y={H - 8} textAnchor="end" fontSize="12" fill="var(--lula)">Lula na frente →</text>
       </svg>
-      <div className="legend"><span><i className="sw" style={{ background: 'var(--fg)', height: 14, width: 4 }} /> caso típico</span><span><i className="sw" style={{ background: 'var(--fg2)', height: 6 }} /> onde ficaram 8 de cada 10 simulações</span></div>
+      <div className="legend">
+        <span><i className="sw lula" />Lula na frente</span><span><i className="sw flavio" />Flávio na frente</span>
+        <span><i className="sw" style={{ width: 4, height: 14, background: 'var(--fg)' }} />caso típico</span>
+        <span><i className="sw" style={{ height: 6, background: 'var(--fg2)' }} />8 de cada 10 simulações</span>
+        <span><i className="sw" style={{ height: 8, background: 'transparent', border: '1.5px dashed var(--fg)' }} />sem ninguém impedido</span>
+      </div>
     </div>
   );
 }
 
 /** Exercício didático: dá a ordem de grandeza sob suposições que a pessoa escolhe. Nada aqui é previsão. */
-export default function PotentialImpactExplorer({ listas }) {
-  const [id, setId] = useParamNum('il', listas[listas.length - 1].id);
-  const l = listas.find((x) => x.id === id) || listas[0];
-  const observado = Math.round(dois(l) * 100);
-  const compObs = l.aptosComResultado ? Math.round((l.validos / l.aptosComResultado) * 100) : 75;
-  // as escolhas ficam na URL (il = lista, imp, pref, comp, nac, inc); pref e comp vazios = usar o que se viu no 1º turno
-  const [imp, setImp] = useParamNum('imp', 10);
+export default function PotentialImpactExplorer() {
+  const ctrl = useApi('controle'), hist = useApi('historia');
+  const [imp, setImp] = useParamNum('imp', 130000);                 // eleitores que não conseguiriam votar (número absoluto)
   const [prefP, setPrefP] = useParam('pref'), [compP, setCompP] = useParam('comp');
-  const pref = prefP === '' || !Number.isFinite(Number(prefP)) ? null : Number(prefP), setPref = (v) => setPrefP(v == null ? '' : v);
-  const comp = compP === '' || !Number.isFinite(Number(compP)) ? null : Number(compP), setComp = (v) => setCompP(v == null ? '' : v);
-  const [nac, setNac] = useParam('nac');
-  const ctrl = useApi('controle');   // só para o total nacional de votos do 1º turno
-  const [inc, setInc] = useParamNum('inc', 10);   // quanto as suposições podem estar erradas, em pontos percentuais
-  const prefEf = pref ?? observado, compEf = comp ?? compObs;
-  const maxImp = Math.round(l.eleitores * 0.5), passo = Math.max(1, Math.round(l.eleitores / 400));
-  const nDec = (n) => Number(n).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
-  const grau = inc === 0 ? 'nenhuma dúvida' : inc <= 5 ? 'pouca dúvida' : inc <= 12 ? 'dúvida média' : 'muita dúvida';
+  const [ta, setTa] = useParamNum('ta', 40), [tb, setTb] = useParamNum('tb', 60);   // "outros candidatos": Lula até ta, não votam de ta a tb, Flávio de tb a 100
+  const [inc, setInc] = useParamNum('inc', 4);
+  const nac = ctrl.data && ctrl.data.nacional;
+  const l = hist.data && hist.data.listas.find((x) => x.id === ultimaLista().id);
+  const MAX_IMP = 3000000;
+  const observado = l ? Math.round(dois(l) * 100) : 50;
+  const compObs = l && l.aptosComResultado ? Math.round((l.validos / l.aptosComResultado) * 100) : 75;
+  const pref = prefP === '' || !Number.isFinite(Number(prefP)) ? observado : Number(prefP);
+  const comp = compP === '' || !Number.isFinite(Number(compP)) ? compObs : Number(compP);
+  const a = Math.min(ta, tb), b = Math.max(ta, tb);
+  const tl = a, tn = b - a, tf = 100 - b;
+  const grau = inc === 0 ? 'nenhuma dúvida' : inc <= 3 ? 'pouca dúvida' : inc <= 6 ? 'dúvida média' : 'muita dúvida';
 
   const r = useMemo(() => {
-    const impedidos = l.eleitores * (imp / 100);
-    const naoVotam = impedidos * (compEf / 100);
-    const lulaPerde = naoVotam * (prefEf / 100), flavioPerde = naoVotam - lulaPerde;
-    // 4.000 simulações: o comparecimento e a parcela de Lula variam ao redor dos valores escolhidos (90% dos sorteios dentro de ± inc pontos)
-    const dp = inc / 1.645;
-    const saldos = SORTEIOS.map(([zc, zp]) => impedidos * (limita(compEf + dp * zc) / 100) * (1 - 2 * (limita(prefEf + dp * zp) / 100))).sort((a, b) => a - b);
-    const q = (p) => saldos[Math.min(N_SIM - 1, Math.floor(p * N_SIM))];
-    return { impedidos, naoVotam, lulaPerde, flavioPerde, liquido: flavioPerde - lulaPerde, saldos, p10: q(0.1), p50: q(0.5), p90: q(0.9),
-      favLula: saldos.filter((v) => v > 0.5).length / N_SIM, favFlavio: saldos.filter((v) => v < -0.5).length / N_SIM };
-  }, [l, imp, prefEf, compEf, inc]);
-  const nacional = Number(String(nac).replace(/\./g, '').replace(',', '.')) || 0;
+    if (!nac) return null;
+    const p = { imp, comp, pref, tl, tf, inc };
+    const cen = simular(nac, p), base = simular(nac, { ...p, imp: 0 });
+    const naoVotam = imp * (comp / 100), lulaPerde = naoVotam * (pref / 100), flavioPerde = naoVotam - lulaPerde;
+    const q = (arr, pp) => arr[Math.floor(pp * N_SIM)];
+    return { cen, base, naoVotam, lulaPerde, flavioPerde, liquido: flavioPerde - lulaPerde, p10: q(cen, 0.1), p50: q(cen, 0.5), p90: q(cen, 0.9), med0: q(base, 0.5),
+      pL: cen.filter((v) => v > 0).length / N_SIM, pL0: base.filter((v) => v > 0).length / N_SIM };
+  }, [nac, imp, comp, pref, tl, tf, inc]);
+  if (!nac || !l || !r) return <div className="empty" role="status">Carregando…</div>;
+
   const maxBar = Math.max(r.lulaPerde, r.flavioPerde, 1);
-  const saldoTxt = (v) => (Math.abs(v) < 0.5 ? 'efeito nulo' : `${nInt(Math.abs(v))} votos a favor de ${v > 0 ? 'Lula' : 'Flávio Bolsonaro'}`);
-  const de10 = (p) => Math.round(p * 10);
-  const nacL = ctrl.data?.nacional?.lula, nacF = ctrl.data?.nacional?.flavio, diff1 = nacL != null ? nacL - nacF : null;
-  // quantas simulações têm saldo, na direção do candidato que está à frente, maior que a diferença nacional do 1º turno
-  const contra = diff1 == null ? 0 : r.saldos.filter((v) => (diff1 > 0 ? -v : v) > Math.abs(diff1)).length / N_SIM;
-  const pctSim = (p) => (p === 0 ? 'nenhuma' : p < 0.01 ? 'menos de 1%' : nPct(p, 0));
+  const pc = (v) => (v === 0 ? '0%' : v < 0.01 ? '< 1%' : v > 0.99 ? '> 99%' : `${Math.round(v * 100)}%`);
+  const usoLista = Math.min(100, (l.eleitores / MAX_IMP) * 100);
 
   return (
     <div className="impacto" aria-label="Exercício hipotético">
-      <div className="imp-head"><span className="badge">Exercício hipotético · não é previsão</span></div>
-      <p className="note">Mexa nos controles abaixo para ver, em ordem de grandeza, o que aconteceria <em>se</em> alguns eleitores listados deixassem de votar. Quem decide as suposições é você: o site não sabe quantos eleitores foram, de fato, afetados.</p>
-      <div className="imp-controls">
-        <label>1. Qual lista usar
-          <select value={id} onChange={(e) => { setId(Number(e.target.value)); setPref(null); setComp(null); }}>
-            {listas.map((x) => <option key={x.id} value={x.id}>{ehUltima(x.id) ? `${x.nome} (mais recente)` : x.nome} — {nInt(x.eleitores)} eleitores</option>)}
-          </select>
-        </label>
-        <label>
-          <span>2. Quantos desses eleitores <strong>não conseguiriam votar</strong>: <output>{nInt(r.impedidos)} <small>({nDec(imp)}% de {nInt(l.eleitores)})</small></output></span>
-          <input type="range" min="0" max={maxImp} step={passo} value={Math.min(maxImp, Math.round(r.impedidos / passo) * passo)} onChange={(e) => setImp(Math.round((Number(e.target.value) / l.eleitores) * 1000) / 10)}
-            aria-label="Número de eleitores que não conseguiriam votar" aria-valuetext={`${nInt(r.impedidos)} eleitores, ${nDec(imp)}% dos listados`} />
-          <span className="imp-escala"><small>0</small><small>{nInt(maxImp)} (metade)</small></span>
-        </label>
-        <label>
-          <span>3. De cada 100 desses eleitores, quantos <strong>teriam votado</strong>: <output>{compEf}</output> <InfoTip texto="Nem todo eleitor listado votaria. De partida usamos o que se viu no 1º turno nessas seções (votos válidos em relação aos eleitores aptos). Não inclui brancos e nulos, e o 2º turno pode ter outro comparecimento." /></span>
-          <input type="range" min="30" max="100" step="1" value={compEf} onChange={(e) => setComp(Number(e.target.value))} />
-          <button type="button" className="linklike" onClick={() => setComp(null)}>Usar o do 1º turno nesta lista ({compObs})</button>
-        </label>
-        <label>
-          <span>4. De cada 100 votos perdidos, quantos seriam de <strong>Lula</strong>: <output>{prefEf}</output> <small>(o resto seria de Flávio Bolsonaro)</small></span>
-          <input type="range" min="0" max="100" step="1" value={prefEf} onChange={(e) => setPref(Number(e.target.value))} />
-          <button type="button" className="linklike" onClick={() => setPref(null)}>Usar o do 1º turno nesta lista ({observado})</button>
-        </label>
-        <label>
-          <span>5. O quanto você <strong>duvida</strong> dos números 3 e 4: <output>{inc === 0 ? grau : `${grau} (± ${inc})`}</output> <InfoTip texto="Os números 3 e 4 são chutes educados. Esta barra diz o quanto eles poderiam estar errados, para mais ou para menos. Quanto maior a dúvida, mais espalhado fica o resultado das simulações." /></span>
-          <input type="range" min="0" max="30" step="1" value={inc} onChange={(e) => setInc(Number(e.target.value))} />
-        </label>
+      <div className="imp-head"><span className="badge">Exercício hipotético · não é previsão oficial</span></div>
+      <p className="note">Mexa nos controles para ver, em ordem de grandeza, o que aconteceria <em>se</em> alguns eleitores deixassem de votar. Partimos dos votos reais do 1º turno de todo o país e quem escolhe as suposições é você: o site não sabe quantos eleitores foram, de fato, afetados, nem como será o 2º turno.</p>
+
+      <div className="imp-bloco">
+        <h3 className="imp-tit">1. Quantos eleitores não conseguiriam votar?</h3>
+        <output className="imp-valor">{nInt(imp)} eleitores</output>
+        <div className="rel">
+          <input className="ctl uni" type="range" min="0" max={MAX_IMP} step="5000" value={Math.min(MAX_IMP, imp)} style={{ '--p': `${(Math.min(MAX_IMP, imp) / MAX_IMP) * 100}%` }}
+            onChange={(e) => setImp(Number(e.target.value))} aria-label="Eleitores que não conseguiriam votar" aria-valuetext={`${nInt(imp)} eleitores`} />
+          <i className="imp-marca" style={{ left: `${usoLista}%` }} aria-hidden="true" />
+        </div>
+        <span className="imp-escala"><small>0</small><small>3 milhões</small></span>
+        <p className="note">A marca no controle (| {nInt(l.eleitores)}) é o total de eleitores nas seções da lista mais recente.</p>
       </div>
+
+      <div className="imp-bloco">
+        <h3 className="imp-tit">2. Entre os votos que deixariam de ser depositados, quantos seriam de cada um?</h3>
+        <div className="imp-split"><b className="pos">Lula {pref}%</b><b className="neg">Flávio {100 - pref}%</b></div>
+        <input className="ctl duo" type="range" min="0" max="100" step="1" value={pref} style={{ '--p': `${pref}%` }} onChange={(e) => setPrefP(Number(e.target.value))}
+          aria-label="Parcela dos votos perdidos que seria de Lula (o resto é de Flávio)" />
+        <button type="button" className="btn-pilula" onClick={() => setPrefP('')}><span aria-hidden="true">↺</span> Usar o perfil do 1º turno nessas seções ({observado}% Lula)</button>
+      </div>
+
+      <div className="imp-bloco">
+        <h3 className="imp-tit">3. Eleitores de outros candidatos no 1º turno: para quem vão no 2º?</h3>
+        <div className="imp-split tres"><b className="pos">Lula {tl}%</b><b className="mudo">Não votam {tn}%</b><b className="neg">Flávio {tf}%</b></div>
+        <div className="dual" style={{ '--a': `${a}%`, '--b': `${b}%` }}>
+          <input className="ctl" type="range" min="0" max="100" value={a} onChange={(e) => { const v = Number(e.target.value); setTa(Math.min(v, b)); setTb(b); }} aria-label="Fim da parcela de Lula" />
+          <input className="ctl" type="range" min="0" max="100" value={b} onChange={(e) => { const v = Number(e.target.value); setTb(Math.max(v, a)); setTa(a); }} aria-label="Início da parcela de Flávio" />
+        </div>
+        <div className="imp-escala"><small>← Lula</small><small>não votam, branco ou nulo</small><small>Flávio →</small></div>
+        <button type="button" className="btn-pilula" onClick={() => { const v = 80, lv = Math.round((v * nac.lula) / (nac.lula + nac.flavio)); setTa(lv); setTb(lv + 20); }}><span aria-hidden="true">↺</span> Dividir como no 1º turno ({Math.round((nac.lula / (nac.lula + nac.flavio)) * 100)}% Lula × {Math.round((nac.flavio / (nac.lula + nac.flavio)) * 100)}% Flávio entre quem vota)</button>
+        <p className="note">Os três valores sempre somam 100%: mova as duas alças para dividir.</p>
+      </div>
+
+      <details className="imp-avancado">
+        <summary>Ajustes avançados (opcional)</summary>
+        <div className="imp-controls">
+          <label><span>De cada 100 eleitores impedidos, quantos teriam votado: <output>{comp}</output> <InfoTip texto="Nem todo eleitor listado votaria. De partida usamos o que se viu no 1º turno nessas seções (votos válidos em relação aos eleitores aptos)." /></span>
+            <input className="ctl uni" type="range" min="30" max="100" value={comp} style={{ '--p': `${((comp - 30) / 70) * 100}%` }} onChange={(e) => setCompP(Number(e.target.value))} /></label>
+          <label><span>O quanto você duvida dos números 2 e 3: <output>{grau}{inc ? ` (± ${inc})` : ''}</output> <InfoTip texto="Os números 2 e 3 são suposições. Esta barra diz o quanto elas poderiam estar erradas, para mais ou para menos. Quanto maior a dúvida, mais espalhado fica o resultado das simulações." /></span>
+            <input className="ctl uni" type="range" min="0" max="10" value={inc} style={{ '--p': `${inc * 10}%` }} onChange={(e) => setInc(Number(e.target.value))} /></label>
+        </div>
+      </details>
 
       <div className="imp-out" aria-live="polite">
         <h3 className="imp-tit">O que isso significa</h3>
-        <p className="imp-eq">Se <strong>{nInt(r.impedidos)}</strong> eleitores não conseguissem votar e {compEf} de cada 100 deles votariam normalmente, cerca de <strong>{nInt(r.naoVotam)}</strong> votos deixariam de ser depositados.</p>
+        <p className="imp-eq"><strong>{nInt(imp)}</strong> eleitores impedidos → cerca de <strong>{nInt(r.naoVotam)}</strong> votos deixariam de ser depositados <span>(com comparecimento de {comp}%)</span>.</p>
         <div className="imp-bars">
           <div><span>Lula</span><i className="seg lula" style={{ width: `${(r.lulaPerde / maxBar) * 100}%` }} /><b>−{nInt(r.lulaPerde)}</b></div>
           <div><span>Flávio</span><i className="seg flavio" style={{ width: `${(r.flavioPerde / maxBar) * 100}%` }} /><b>−{nInt(r.flavioPerde)}</b></div>
         </div>
-        <p className="imp-liq">No saldo, a diferença entre os dois candidatos mudaria em cerca de <strong>{nInt(Math.abs(r.liquido))} votos</strong>{r.liquido === 0 ? ' (efeito neutro)' : r.liquido > 0 ? ', a favor de Lula (Flávio perderia mais votos).' : ', a favor de Flávio Bolsonaro (Lula perderia mais votos).'}</p>
+        <p className="imp-liq">No saldo, a diferença entre os candidatos mudaria em <strong>{nInt(Math.abs(r.liquido))} votos</strong>{Math.abs(r.liquido) < 0.5 ? ' (efeito neutro)' : r.liquido > 0 ? ' a favor de Lula (Flávio perderia mais votos).' : ' a favor de Flávio Bolsonaro (Lula perderia mais votos).'}</p>
       </div>
 
       <div className="imp-out" aria-live="polite">
-        <h3 className="imp-tit">E se os números 3 e 4 estiverem errados?</h3>
-        <p className="note">Como ninguém sabe os números exatos, rodamos {nInt(N_SIM)} simulações, cada uma com um comparecimento e uma divisão entre Lula e Flávio um pouco diferentes, dentro da dúvida que você escolheu. Cada barra abaixo mostra em quantas simulações aquele resultado apareceu.</p>
-        {inc === 0
-          ? <p className="imp-liq">Sem dúvida nenhuma, todas as simulações dão o mesmo resultado: {saldoTxt(r.liquido)}. Aumente a dúvida (controle 5) para ver como o resultado se espalha.</p>
-          : (
-            <>
-              <GraficoSimulacoes saldos={r.saldos} p10={r.p10} p50={r.p50} p90={r.p90} />
-              <p className="imp-liq">
-                Em 8 de cada 10 simulações, o efeito ficou entre <strong>{saldoTxt(r.p10)}</strong> e <strong>{saldoTxt(r.p90)}</strong>.{' '}
-                {r.p10 * r.p90 > 0 ? `Em todos esses casos o efeito foi no mesmo sentido.` : 'Dependendo das suposições, o efeito poderia até mudar de lado.'}
-                {' '}Em {de10(r.favLula)} de cada 10 simulações o saldo favoreceu Lula; em {de10(r.favFlavio)}, Flávio.
-              </p>
-            </>
-          )}
-        <h3 className="imp-tit">Isso pesaria na diferença nacional?</h3>
-        {diff1 != null && (
-          <p className="imp-liq">
-            No 1º turno, no país todo, {diff1 > 0 ? 'Lula' : 'Flávio Bolsonaro'} ficou à frente por <strong>{nInt(Math.abs(diff1))} votos</strong> ({nInt(nacL)} contra {nInt(nacF)}).
-            O saldo típico desta simulação ({nInt(Math.abs(r.p50))} votos {r.p50 > 0 ? 'para Lula' : 'para Flávio'}) equivale a <strong>{nPct(Math.abs(r.p50) / Math.abs(diff1), 2)}</strong> dessa diferença.
-            {inc > 0 && <> Em {pctSim(contra)} das simulações o efeito foi grande o bastante para {diff1 > 0 ? 'passar a vantagem de Lula' : 'passar a vantagem de Flávio'} no 1º turno, <em>mantendo todo o resto igual</em>.</>}
-          </p>
-        )}
-        <label className="nac">Prefere comparar com outra diferença, por exemplo a que você espera no 2º turno? <input inputMode="numeric" placeholder="Ex.: 1.500.000" value={nac} onChange={(e) => setNac(e.target.value)} aria-label="Outra diferença de votos entre os candidatos (opcional)" /></label>
-        {nacional > 0 && <p className="imp-nac">Com estas suposições, o saldo típico de {nInt(Math.abs(r.p50))} votos equivale a <strong>{nPct(Math.abs(r.p50) / nacional, 2)}</strong> da diferença que você informou, e o saldo desta simulação central ({nInt(Math.abs(r.liquido))}) a {nPct(Math.abs(r.liquido) / nacional, 2)}. O valor foi digitado por você; o site não sabe qual será a diferença do 2º turno.</p>}
-        <p className="note">É uma comparação de tamanho, não uma previsão do 2º turno: a diferença final dependerá de quem votar, em quem, e de muito mais do que as seções listadas.</p>
+        <h3 className="imp-tit">E o 2º turno, com essas suposições?</h3>
+        <p className="note">Rodamos {nInt(N_SIM)} simulações do 2º turno a partir dos votos do 1º turno, cada uma com pequenas variações dentro da dúvida que você escolheu. Cada barra mostra em quantas simulações aquele resultado apareceu.</p>
+        <div className="imp-kpis">
+          <div className="kpi"><span>Chance de Lula vencer</span><b className="pos">{pc(r.pL)}</b><small>{imp ? `sem impedidos: ${pc(r.pL0)}` : 'sem eleitores impedidos'}</small></div>
+          <div className="kpi"><span>Chance de Flávio vencer</span><b className="neg">{pc(1 - r.pL)}</b><small>{imp ? `sem impedidos: ${pc(1 - r.pL0)}` : 'sem eleitores impedidos'}</small></div>
+          <div className="kpi"><span>Diferença típica</span><b>{Math.abs(r.p50) < 500 ? 'empate' : nInt(Math.abs(r.p50))}</b><small>{Math.abs(r.p50) < 500 ? 'praticamente' : `votos a favor de ${r.p50 > 0 ? 'Lula' : 'Flávio'}`}{imp ? ` · seu cenário desloca ${nInt(Math.abs(r.p50 - r.med0))}` : ''}</small></div>
+        </div>
+        {inc === 0 && <p className="note">Sem dúvida nenhuma, todas as simulações dão o mesmo resultado. Aumente a dúvida (ajustes avançados) para ver como o resultado se espalha.</p>}
+        <GraficoSimulacoes cen={r.cen} base={r.base} />
+        <p className="imp-liq">
+          Em 8 de cada 10 simulações, o resultado ficou entre <strong>{txtSaldo(r.p10)}</strong> e <strong>{txtSaldo(r.p90)}</strong>.
+          {imp > 0 && <> Os <strong>{nInt(imp)}</strong> eleitores impedidos mudam a chance de Lula de <strong>{pc(r.pL0)}</strong> para <strong>{pc(r.pL)}</strong>.</>}
+        </p>
+        <p className="note">Base: votos do 1º turno de todas as seções do país (TSE): Lula {nInt(nac.lula)} · Flávio {nInt(nac.flavio)} · outros candidatos {nInt(nac.outros)}. Brancos e nulos ficam de fora. Os números mostram o efeito das suas suposições; não são uma previsão do resultado.</p>
       </div>
 
       <ul className="imp-notas">
         <li>Tudo isto é <strong>hipotético</strong>: depende das suposições escolhidas e não é uma previsão.</li>
         <li>Os votos do 1º turno servem só para estimar o perfil das seções; não são votos do 2º turno.</li>
-        <li>Usamos os eleitores de <em>uma</em> lista por vez, para ninguém ser contado duas vezes.</li>
         <li>As listas podem conter registros que foram corrigidos depois.</li>
       </ul>
     </div>
