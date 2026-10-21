@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { nInt, quem } from '../format.js';
+import { nInt, nPts } from '../format.js';
 import { ehUltima } from '../listas.js';
 
 const partes = (l) => String(l.label).split(' · ');   // "20/10 · 15h27" → ['20/10', '15h27']
@@ -17,8 +17,6 @@ export default function VersionTimeline({ listas, selecionada, onSelect }) {
     refs.current[j]?.focus();
   };
   return (
-    <>
-    <p className="note tl-legenda">Em cada versão, o número colorido mostra quem estava à frente nessas seções no 1º turno e por quantos pontos percentuais.</p>
     <div className="timeline" role="tablist" aria-label="Versões da lista de seções alteradas">
       {listas.map((l, i) => {
         const ativa = l.id === selecionada, ultima = ehUltima(l.id);
@@ -30,11 +28,10 @@ export default function VersionTimeline({ listas, selecionada, onSelect }) {
               {partes(l)[0]}<small>{partes(l)[1]}{ultima ? ' · mais recente' : ''}</small>
             </span>
             <span className="tl-n">{nInt(l.secoes)}<small> seções</small></span>
-            <span className={'tl-m ' + (Math.abs(l.margem) < 0.5 ? '' : l.margem >= 0 ? 'pos' : 'neg')}>{quem(l.margem)}</span>
+            <span className={'tl-m ' + (l.margem >= 0 ? 'pos' : 'neg')}>{nPts(l.margem)}</span>
           </button>
         );
       })}
     </div>
-    </>
   );
 }
