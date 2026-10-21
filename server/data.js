@@ -78,18 +78,6 @@ export function resumo(f) {
   return LISTAS.map((l) => ({ ...l, ...somar(rs, l.id) })).filter((x) => x.secoes > 0);
 }
 
-/** Distribuição da margem das seções de cada lista (101 quantis, para desenhar a curva acumulada) e algumas leituras simples. */
-export function distribuicao(f) {
-  const rs = base(f).filter(temResultado);
-  const quantil = (a, p) => { const i = (a.length - 1) * p, lo = Math.floor(i); return a[lo] + (a[Math.ceil(i)] - a[lo]) * (i - lo); };
-  return { listas: LISTAS.map((l) => {
-    const m = rs.filter((r) => r.em[l.id - 1]).map((r) => margem(r.lula, r.flavio, r.lula + r.flavio + r.outros)).sort((a, b) => a - b);
-    if (!m.length) return { id: l.id, label: l.label, nome: l.nome, n: 0 };
-    return { id: l.id, label: l.label, nome: l.nome, n: m.length, mediana: quantil(m, 0.5), pctLula: m.filter((x) => x > 0).length / m.length, pctFlavio: m.filter((x) => x < 0).length / m.length,
-      q: Array.from({ length: 101 }, (_, i) => +quantil(m, i / 100).toFixed(2)) };
-  }) };
-}
-
 export function mudancas(f) {
   const rs = base(f);
   const nome = (id) => LISTAS[id - 1].label;

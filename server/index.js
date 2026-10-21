@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { meta, resumo, mudancas, distribuicao, estados, municipios, secoes, historia } from './data.js';
+import { meta, resumo, mudancas, estados, municipios, secoes, historia } from './data.js';
 
 const app = express();
 const dir = path.dirname(fileURLToPath(import.meta.url));
@@ -33,7 +33,6 @@ app.get('/api/mapa-municipios', (_req, res) => (mapaMun ? res.json(mapaMun) : re
 app.get('/api/meta', (_req, res) => res.json(meta()));
 app.get('/api/resumo', sendOrCsv('resumo-por-lista', resumo));
 app.get('/api/mudancas', sendOrCsv('mudancas-entre-listas', mudancas));
-app.get('/api/distribuicao', (req, res) => res.json(distribuicao(q(req))));
 app.get('/api/estados', sendOrCsv('estados', estados));
 app.get('/api/municipios', sendOrCsv('municipios', municipios));
 app.get('/api/secoes', sendOrCsv('secoes', secoes));

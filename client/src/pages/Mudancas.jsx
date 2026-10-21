@@ -1,7 +1,7 @@
 import { useApi } from '../api.js';
 import { nInt, nPct, nPts, nSig } from '../format.js';
 import { H } from '../hints.js';
-import { CurvasMargem, TabelaListas, leitura } from '../components/Ecdf.jsx';
+import { BarrasMargem } from '../components/Charts.jsx';
 import DataTable from '../components/DataTable.jsx';
 import { Baixar, BaixarGrafico, Card, Carregando, Legenda, Recolhivel } from '../components/ui.jsx';
 import { descreveFiltros } from '../exportar.js';
@@ -10,27 +10,19 @@ import { primeiraLista, ultimaLista } from '../listas.js';
 
 const CSV_TROCAS = [{ key: 'passo', label: 'Troca' }, { key: 'situacao', label: 'Situação' }, { key: 'secoes', label: 'Seções' }, { key: 'semResultado', label: 'Sem resultado' }, { key: 'eleitores', label: 'Eleitores' }, { key: (d) => (d.lulaPct == null ? '' : (d.lulaPct * 100).toFixed(2)), label: 'Lula (%)' }, { key: (d) => (d.flavioPct == null ? '' : (d.flavioPct * 100).toFixed(2)), label: 'Flávio (%)' }, { key: (d) => (d.margem == null ? '' : d.margem.toFixed(2)), label: 'Margem (pts)' }];
 
-const CSV_DIST = [{ key: 'label', label: 'Lista' }, { key: 'n', label: 'Seções com resultado' }, { key: (l) => (l.pctLula * 100).toFixed(1), label: 'Lula à frente (%)' }, { key: (l) => (l.pctFlavio * 100).toFixed(1), label: 'Flávio à frente (%)' }, { key: (l) => l.mediana.toFixed(2), label: 'Margem da seção típica (pts)' }];
-
 export default function Mudancas({ filtros }) {
   const p = { uf: filtros.uf, municipio: filtros.municipio, lider: filtros.lider };
-  const st = useApi('mudancas', p), dist = useApi('distribuicao', p);
-  if (!st.data || !dist.data) return <Carregando state={st.data ? dist : st} />;
+  const st = useApi('mudancas', p);
+  if (!st.data) return <Carregando state={st} />;
   const { detalhe, efeito } = st.data;
-  const linhasCsv = detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === primeiraLista().id && d.b === ultimaLista().id)));
+  const itens = detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === primeiraLista().id && d.b === ultimaLista().id)))
+    .map((d) => ({ id: `${d.passo}|${d.situacao}`, rotulo: `${d.passo} · ${d.situacao.toLowerCase()} (${nInt(d.secoes)})`, valor: d.margem, dica: [`${nInt(d.secoes)} seções · ${nInt(d.eleitores)} eleitores`, `Lula ${nPct(d.lulaPct)} · Flávio ${nPct(d.flavioPct)}`] }));
   return (
     <div className="stack">
-      <Card titulo="Como as seções de cada lista votaram no 1º turno" acoes={<BaixarGrafico titulo="Distribuição da margem por lista" filtros={descreveFiltros(filtros)} nome="distribuicao-margem-por-lista" csv={{ colunas: CSV_DIST, linhas: dist.data.listas.filter((l) => l.n > 0) }} />}
-        nota="Cada curva é uma lista. Em cada ponto, a altura mostra a parte das seções da lista que tem margem até aquele valor: curvas mais à direita têm seções mais favoráveis a Lula; curvas coladas indicam listas parecidas. A margem é do 1º turno e não indica o motivo da mudança.">
-        <CurvasMargem listas={dist.data.listas} />
-        <p className="insight">{leitura(dist.data.listas)}</p>
-        <TabelaListas listas={dist.data.listas} />
+      <Card titulo="Margem nas seções que saíram, ficaram ou entraram" acoes={<BaixarGrafico titulo="Margem nas seções que saíram, ficaram ou entraram" filtros={descreveFiltros(filtros)} nome="margem-por-troca" csv={{ colunas: CSV_TROCAS, linhas: detalhe.filter((d) => d.secoes > 0 && d.margem != null && (d.situacao !== 'Mantidas' || (d.a === primeiraLista().id && d.b === ultimaLista().id))) }} />} nota="Barra à direita (sólida): Lula na frente. Barra à esquerda (listrada): Flávio na frente. A margem é do 1º turno e não indica o motivo da mudança.">
+        <Legenda />
+        <BarrasMargem itens={itens} />
       </Card>
-      <Recolhivel titulo="Margem nas seções que saíram, ficaram ou entraram" nota="Cada troca entre listas, em margem do 1º turno" acoes={<BaixarGrafico titulo="Margem nas seções que saíram, ficaram ou entraram" filtros={descreveFiltros(filtros)} nome="margem-por-troca" csv={{ colunas: CSV_TROCAS, linhas: linhasCsv }} />}>
-        <DataTable free chave="b" idLinha={(r) => `${r.passo}|${r.situacao}`} columns={[
-          { key: 'passo', label: 'Troca', left: true }, { key: 'situacao', label: 'Situação', left: true }, { key: 'secoes', label: 'Seções', format: nInt }, { key: 'margem', label: 'Margem', format: nPts, tone: true, hint: H.margem },
-        ]} rows={linhasCsv} />
-      </Recolhivel>
       <Recolhivel titulo="Efeito sobre a margem da lista" nota="Margem da lista antes e depois de cada troca (variação de composição, não swing eleitoral)">
         <DataTable free chave="a" columns={[
           { key: 'passo', label: 'Troca', left: true }, { key: 'antes', label: 'Margem antes', format: nPts, tone: true, hint: H.margem }, { key: 'depois', label: 'Margem depois', format: nPts, tone: true, hint: H.margem },
