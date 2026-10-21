@@ -11,8 +11,8 @@ export default function Impacto({ filtros }) {
   return (
     <div className="stack">
       <h1 className="page-title">Impacto potencial</h1>
-      <Secao titulo="O que sabemos, o que podemos estimar e o que não sabemos"><SaberEstimar /></Secao>
-      <Secao titulo="E se parte dos eleitores não conseguisse votar?" intro="Uma simulação para dar noção de escala e de incerteza. Ela não prevê nada.">
+      <Secao titulo="O que sabemos, o que dá para estimar e o que não sabemos"><SaberEstimar /></Secao>
+      <Secao titulo="E se parte dos eleitores não conseguisse votar?" intro="Um exercício para dar noção de tamanho. Você escolhe as suposições e vê o que elas significam. Não prevê nada.">
         <PotentialImpactExplorer key={filtros.uf + filtros.municipio + filtros.lider} listas={st.data.listas} />
       </Secao>
     </div>
