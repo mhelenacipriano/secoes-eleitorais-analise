@@ -1,0 +1,59 @@
+name: Atualizar lista do TSE (automático)
+
+# Tenta ler o painel do SIG/TSE com um navegador (Playwright) nos horários abaixo e, se houver lista nova, atualiza a análise
+# e a consulta. O painel costuma bloquear servidores (erro 403): se isso acontecer, a execução termina com um AVISO (não falha)
+# e a atualização continua possível pelo Mac (scripts/agendar-mac.sh) ou pelo workflow manual "Atualizar lista do TSE".
+#
+# Horários (Brasília = UTC−3), 10 min depois de cada atualização do TSE: 06:35, 11:35, 15:35 e 20:35.
+# Para atualizar também a consulta, crie o segredo CONSULTA_TOKEN (token com permissão de escrita em
+# mhelenacipriano/secoes-eleitorais-consulta-2026: Settings → Developer settings → Fine-grained tokens → Contents: Read and write).
+on:
+  schedule:
+    - cron: '35 9,14,18,23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: atualizar-lista
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TEM_TOKEN: ${{ secrets.CONSULTA_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        if: env.TEM_TOKEN == 'true'
+        with:
+          repository: mhelenacipriano/secoes-eleitorais-consulta-2026
+          token: ${{ secrets.CONSULTA_TOKEN }}
+          path: consulta
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - name: Dependências da consulta
+        if: env.TEM_TOKEN == 'true'
+        run: npm ci --prefix consulta
+      - name: Navegador
+        run: |
+          npm i --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Ler o painel e atualizar
+        run: |
+          git config --global user.name "atualizador-listas"
+          git config --global user.email "actions@users.noreply.github.com"
+          if [ "$TEM_TOKEN" = "true" ]; then export CONSULTA_DIR="$GITHUB_WORKSPACE/consulta"; fi
+          set +e
+          xvfb-run -a node scripts/atualizar-tudo.mjs
+          codigo=$?
+          set -e
+          if [ "$codigo" = "3" ]; then
+            echo "::warning title=Não foi possível ler o painel do TSE::O painel bloqueou ou não abriu a partir do GitHub (costuma ser 403). Veja o log. Alternativas: agendamento no Mac ou workflow manual."
+            exit 0
+          fi
+          exit $codigo
