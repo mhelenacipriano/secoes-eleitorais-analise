@@ -46,9 +46,17 @@ const pub = new Date(publicada);
 if (Number.isNaN(pub.getTime())) falha(`data de publicação inválida: ${publicada}`);
 
 // 3) lê e confere
-const novos = parse(new TextDecoder('latin1').decode(bytes), { columns: true, delimiter: ';', skip_empty_lines: true });
+const todos = parse(new TextDecoder('latin1').decode(bytes), { columns: true, delimiter: ';', skip_empty_lines: true });
+// Desde 22/10 o TSE publica TODAS as seções do país e deixa o local final em branco nas que não mudaram: só entram as que têm local final diferente do inicial.
+const novos = todos.filter((r) => ns(r.nm_local_votacao_final) !== '' && ns(r.nm_local_votacao_final) !== ns(r.nm_local_votacao_inicial));
+if (novos.length !== todos.length) {
+  console.log(`Arquivo com todas as seções: ${todos.length} linhas, ${novos.length} com local alterado (as demais são ignoradas).`);
+  const esc = (v) => (/[;"\r\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+  const cab = Object.keys(todos[0]);
+  bytes = Buffer.from([cab.join(';'), ...novos.map((r) => cab.map((c) => esc(r[c] ?? '')).join(';'))].join('\r\n') + '\r\n', 'latin1');   // o que fica guardado em fontes/ é só o recorte
+}
 const COLS = ['sg_uf', 'nm_municipio', 'nr_zona', 'nr_secao', 'nm_local_votacao_inicial', 'nm_local_votacao_final', 'qt_eleitores'];
-for (const c of COLS) if (!(novos[0] && c in novos[0])) falha(`coluna ausente no arquivo: ${c}. O formato mudou?`);
+for (const c of COLS) if (!(todos[0] && c in todos[0])) falha(`coluna ausente no arquivo: ${c}. O formato mudou?`);
 const chave = (r) => [r.sg_uf, r.nm_municipio, Number(r.nr_zona), Number(r.nr_secao)].join('|');
 const conj = new Map(novos.map((r) => [chave(r), r]));
 if (conj.size !== novos.length) falha('há seções repetidas no arquivo.');
