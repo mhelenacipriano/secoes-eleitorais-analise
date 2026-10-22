@@ -74,13 +74,15 @@ function GraficoSimulacoes({ cen, base }) {
 /** Exercício didático: dá a ordem de grandeza sob suposições que a pessoa escolhe. Nada aqui é previsão. */
 export default function PotentialImpactExplorer() {
   const ctrl = useApi('controle'), hist = useApi('historia');
-  const [imp, setImp] = useParamNum('imp', 130000);                 // eleitores que não conseguiriam votar (número absoluto)
+  const [impP, setImp] = useParam('imp');                           // eleitores que não conseguiriam votar (número absoluto); vazio = todos os eleitores das seções da lista mais recente
   const [prefP, setPrefP] = useParam('pref'), [compP, setCompP] = useParam('comp');
   const [ta, setTa] = useParamNum('ta', 40), [tb, setTb] = useParamNum('tb', 60);   // "outros candidatos": Lula até ta, não votam de ta a tb, Flávio de tb a 100
   const [inc, setInc] = useParamNum('inc', 4);
   const nac = ctrl.data && ctrl.data.nacional;
   const l = hist.data && hist.data.listas.find((x) => x.id === ultimaLista().id);
   const MAX_IMP = 3000000;
+  const impLista = l ? l.eleitores : 0;
+  const imp = impP === '' || !Number.isFinite(Number(impP)) ? impLista : Number(impP);
   const observado = l ? Math.round(dois(l) * 100) : 50;
   const compObs = l && l.aptosComResultado ? Math.round((l.validos / l.aptosComResultado) * 100) : 75;
   const pref = prefP === '' || !Number.isFinite(Number(prefP)) ? observado : Number(prefP);
@@ -118,7 +120,8 @@ export default function PotentialImpactExplorer() {
           <i className="imp-marca" style={{ left: `${usoLista}%` }} aria-hidden="true" />
         </div>
         <span className="imp-escala"><small>0</small><small>3 milhões</small></span>
-        <p className="note">A marca no controle (| {nInt(l.eleitores)}) é o total de eleitores nas seções da lista mais recente.</p>
+        <p className="note">A marca no controle (| {nInt(l.eleitores)}) é o total de eleitores nas seções da lista mais recente, e é de onde o controle parte.</p>
+        <button type="button" className="btn-pilula" onClick={() => setImp('')}><span aria-hidden="true">↺</span> Usar todos os eleitores da lista mais recente ({nInt(l.eleitores)})</button>
       </div>
 
       <div className="imp-bloco">
