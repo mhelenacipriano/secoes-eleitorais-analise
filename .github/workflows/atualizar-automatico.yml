@@ -4,12 +4,12 @@ name: Atualizar lista do TSE (automático)
 # e a consulta. O painel costuma bloquear servidores (erro 403): se isso acontecer, a execução termina com um AVISO (não falha)
 # e a atualização continua possível pelo Mac (scripts/agendar-mac.sh) ou pelo workflow manual "Atualizar lista do TSE".
 #
-# Horários (Brasília = UTC−3), 10 min depois de cada atualização do TSE: 06:35, 11:35, 15:35 e 20:35.
+# Horários (Brasília = UTC−3): o TSE publica por volta de 06:27, 11:27, 15:27 e 20:27; conferimos duas vezes logo depois (:31 e :46) para pegar a lista cedo.
 # Para atualizar também a consulta, crie o segredo CONSULTA_TOKEN (token com permissão de escrita em
 # mhelenacipriano/secoes-eleitorais-consulta-2026: Settings → Developer settings → Fine-grained tokens → Contents: Read and write).
 on:
   schedule:
-    - cron: '35 9,14,18,23 * * *'
+    - cron: '31,46 9,14,18,23 * * *'
   workflow_dispatch:
 
 permissions:

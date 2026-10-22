@@ -14,6 +14,7 @@ export default function AvisoTse() {
   const vencida = prox.iso && agora > new Date(prox.iso).getTime() + 30 * 60000;   // 30 min de tolerância
   const conferidaDepois = verificadoEm && prox.iso && new Date(verificadoEm) > new Date(prox.iso);   // já olhamos o painel depois do horário previsto
   const passou = vencida && !conferidaDepois;
+  const aguardando = !passou && prox.iso && agora > new Date(prox.iso).getTime() && !conferidaDepois;   // o horário previsto passou, mas ainda não conferimos depois dele
   return (
     <section className="topo-avisos" aria-label="Avisos importantes">
       <header className="ta-cab">
@@ -27,6 +28,7 @@ export default function AvisoTse() {
         {verificadoEm && <div><dt>Painel do TSE conferido em</dt><dd>{dataHora(verificadoEm)}</dd></div>}
       </dl>
       <p className="ta-nota">O TSE atualiza às {HORARIOS_TSE.slice(0, -1).join(', ')} e {HORARIOS_TSE[HORARIOS_TSE.length - 1]}. A lista pode já ter mudado desde a nossa última conferência{conferidaDepois && vencida ? ' (o TSE ainda não publicou a atualização prevista)' : ''}. Esta página está em construção: números e gráficos podem conter erros.</p>
+      {aguardando && <p className="ta-nota" role="status"><strong>O TSE deve ter publicado a atualização das {dataTse(prox.iso).slice(-5)}.</strong> Estamos conferindo: a lista nova chega aqui em alguns minutos.</p>}
       {passou && <p className="ta-atraso" role="status"><strong>A próxima atualização do TSE já deveria ter saído.</strong> Os dados aqui podem estar desatualizados.</p>}
       <details className="ta-como">
         <summary>Como esta análise foi feita · não é um site oficial</summary>
