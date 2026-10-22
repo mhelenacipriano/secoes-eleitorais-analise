@@ -80,9 +80,9 @@ export default function PotentialImpactExplorer() {
   const [inc, setInc] = useParamNum('inc', 4);
   const nac = ctrl.data && ctrl.data.nacional;
   const l = hist.data && hist.data.listas.find((x) => x.id === ultimaLista().id);
-  const MAX_IMP = 3000000;
-  const impLista = l ? l.eleitores : 0;
-  const imp = impP === '' || !Number.isFinite(Number(impP)) ? impLista : Number(impP);
+  const impLista = l ? l.eleitores : 0;                              // eleitores nas seções da lista mais recente: é o máximo do controle
+  const MAX_IMP = Math.max(1, impLista);
+  const imp = impP === '' || !Number.isFinite(Number(impP)) ? impLista : Math.min(MAX_IMP, Math.max(0, Number(impP)));
   const observado = l ? Math.round(dois(l) * 100) : 50;
   const compObs = l && l.aptosComResultado ? Math.round((l.validos / l.aptosComResultado) * 100) : 75;
   const pref = prefP === '' || !Number.isFinite(Number(prefP)) ? observado : Number(prefP);
@@ -104,7 +104,6 @@ export default function PotentialImpactExplorer() {
 
   const maxBar = Math.max(r.lulaPerde, r.flavioPerde, 1);
   const pc = (v) => (v === 0 ? '0%' : v < 0.01 ? '< 1%' : v > 0.99 ? '> 99%' : `${Math.round(v * 100)}%`);
-  const usoLista = Math.min(100, (l.eleitores / MAX_IMP) * 100);
 
   return (
     <div className="impacto" aria-label="Exercício hipotético">
@@ -114,13 +113,9 @@ export default function PotentialImpactExplorer() {
       <div className="imp-bloco">
         <h3 className="imp-tit">1. Quantos eleitores não conseguiriam votar?</h3>
         <output className="imp-valor">{nInt(imp)} eleitores</output>
-        <div className="rel">
-          <input className="ctl uni" type="range" min="0" max={MAX_IMP} step="5000" value={Math.min(MAX_IMP, imp)} style={{ '--p': `${(Math.min(MAX_IMP, imp) / MAX_IMP) * 100}%` }}
-            onChange={(e) => setImp(Number(e.target.value))} aria-label="Eleitores que não conseguiriam votar" aria-valuetext={`${nInt(imp)} eleitores`} />
-          <i className="imp-marca" style={{ left: `${usoLista}%` }} aria-hidden="true" />
-        </div>
-        <span className="imp-escala"><small>0</small><small>3 milhões</small></span>
-        <p className="note">A marca no controle (| {nInt(l.eleitores)}) é o total de eleitores nas seções da lista mais recente, e é de onde o controle parte.</p>
+        <input className="ctl uni" type="range" min="0" max={MAX_IMP} step="1" value={Math.min(MAX_IMP, imp)} style={{ '--p': `${(Math.min(MAX_IMP, imp) / MAX_IMP) * 100}%` }}
+          onChange={(e) => setImp(Number(e.target.value))} aria-label="Eleitores que não conseguiriam votar" aria-valuetext={`${nInt(imp)} eleitores`} />
+        <span className="imp-escala"><small>0</small><small>{nInt(l.eleitores)} = todos os eleitores das seções da lista mais recente</small></span>
         <button type="button" className="btn-pilula" onClick={() => setImp('')}><span aria-hidden="true">↺</span> Usar todos os eleitores da lista mais recente ({nInt(l.eleitores)})</button>
       </div>
 
