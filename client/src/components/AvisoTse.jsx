@@ -22,7 +22,7 @@ export default function AvisoTse() {
         <span className="obra-selo">Em construção</span>
       </header>
       <dl className="ta-grade">
-        <div><dt>Última atualização do TSE</dt><dd>{dataTse(u.publicadaEm)}</dd></div>
+        <div><dt>Última atualização do TSE</dt><dd>{dataTse((pn && pn.ultimaAtualizacao) || u.publicadaEm)}</dd></div>
         <div><dt>Próxima prevista</dt><dd>{prox.texto || '…'}</dd></div>
         <div><dt>Lista que temos, baixada em</dt><dd>{dataHora(u.baixadaEm || u.publicadaEm)}</dd></div>
         {verificadoEm && <div><dt>Painel do TSE conferido em</dt><dd>{dataHora(verificadoEm)}</dd></div>}

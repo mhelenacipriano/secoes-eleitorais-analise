@@ -47,7 +47,19 @@ function atualiza(dir, nome, script, depois, arquivos, opcionais = []) {
   sh('git', ['pull', '--rebase', '--autostash', '-q'], dir);
   const saida = sh(process.execPath, [path.join(dir, script), origem, ...extras], dir);
   console.log(saida);
-  if (/Sem mudança/i.test(saida)) { log(`${nome}: nada mudou`); return false; }
+  if (/Sem mudança/i.test(saida)) {
+    log(`${nome}: a lista é igual à anterior`);
+    // o TSE pode republicar a mesma lista com outro horário: registra a conferência (painel.json) para o aviso do site acompanhar
+    if (nome === 'Análise') {
+      sh('git', ['add', 'server/data/painel.json'], dir);
+      let mudou = true; try { sh('git', ['diff', '--cached', '--quiet'], dir); mudou = false; } catch { /* há diferença */ }
+      if (mudou) {
+        sh('git', ['commit', '-q', '-m', `Painel do TSE conferido (${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}): o TSE republicou a mesma lista`], dir);
+        if (!semPush) sh('git', ['push', '-q'], dir);
+      }
+    }
+    return false;
+  }
   for (const c of depois) sh(c[0], c.slice(1), dir, { stdio: ['ignore', 'inherit', 'inherit'] });
   for (const c of opcionais) { try { sh(c[0], c.slice(1), dir, { stdio: ['ignore', 'inherit', 'inherit'] }); } catch (e) { log(`aviso: ${c.slice(1).join(' ')} falhou e foi ignorado (${String(e.message).split('\n')[0].slice(0, 120)})`); } }
   sh('git', ['add', ...arquivos], dir);
