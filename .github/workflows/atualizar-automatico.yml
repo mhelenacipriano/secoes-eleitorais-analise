@@ -7,9 +7,11 @@ name: Atualizar lista do TSE (automático)
 # Horários (Brasília = UTC−3): o TSE publica por volta de 06:27, 11:27, 15:27 e 20:27; conferimos duas vezes logo depois (:31 e :46) para pegar a lista cedo.
 # Para atualizar também a consulta, crie o segredo CONSULTA_TOKEN (token com permissão de escrita em
 # mhelenacipriano/secoes-eleitorais-consulta-2026: Settings → Developer settings → Fine-grained tokens → Contents: Read and write).
+# Sem agendamento: rode à mão em Actions → Run workflow. Para voltar a rodar sozinho, acrescente em "on:" um bloco
+#   schedule:
+#     - cron: '<minutos> <horas em UTC> * * *'
+# (o GitHub pode atrasar ou pular execuções agendadas).
 on:
-  schedule:
-    - cron: '31,46 9,14,18,23 * * *'
   workflow_dispatch:
 
 permissions:
